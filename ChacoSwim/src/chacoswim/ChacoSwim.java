@@ -202,7 +202,6 @@ public class ChacoSwim extends JFrame {
 			}//switch
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
@@ -263,11 +262,21 @@ public class ChacoSwim extends JFrame {
 			String day = comboBoxdays.getSelectedItem().toString();
 			String query="";
 			if(day.equals("All")){
-				query = "select * from active_record where termID = ? AND locationID = ?";
+				query = "select a.id,s.SID,s.FirstName,s.LastName,s.CurLevel,a.Time as Time,c.name as Coach,a.Line as Line,A.Day as Day from active_record a"
+						+ " INNER JOIN students s ON s.sid=a.sid"
+						+ " INNER JOIN terms t ON t.id = a.termID"
+						+ " INNER JOIN location l ON l.id = a.locationID"
+						+ " INNER JOIN coach c ON c.id = a.coachID"
+						+ " where termID = ? AND locationID = ?";
 				
 			}
 			else{
-				query = "select * from active_record where termID = ? AND locationID = ? AND day = "+day;
+				query = "select a.id,s.SID,s.FirstName,s.LastName,s.CurLevel,a.Time as Time,c.name as Coach,a.Line as Line, s.Cell from active_record a"
+						+ " INNER JOIN students s ON s.sid=a.sid"
+						+ " INNER JOIN terms t ON t.id = a.termID"
+						+ " INNER JOIN location l ON l.id = a.locationID"
+						+ " INNER JOIN coach c ON c.id = a.coachID"
+						+ " where termID = ? AND locationID = ? AND day = '"+day+"'";
 				}
 			PreparedStatement pst=conn.prepareStatement(query);
 			pst.setString(1, termId);
@@ -439,7 +448,6 @@ public class ChacoSwim extends JFrame {
 			rs.close();
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(null, "Line 418: "+e);
 		}
 	}
@@ -492,7 +500,6 @@ public class ChacoSwim extends JFrame {
 			JOptionPane.showMessageDialog(null, "You Didn't Select Any of the Record");
 		}
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(null, "Line471: "+e);
 		}
 		
@@ -655,7 +662,7 @@ public class ChacoSwim extends JFrame {
 		comboBoxdays.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				refreshTableTerm();
-				seatsLeft();
+				//seatsLeft();
 			}
 		});
 		comboBoxdays.setModel(new DefaultComboBoxModel<Object>(new String[] {"All", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"}));
@@ -667,7 +674,7 @@ public class ChacoSwim extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				String id = updateSID();
 				if(!id.isEmpty()){
-					CourseModification.main(new String[]{"add",id,comboBoxTerm.getSelectedItem().toString()},btnRefreshAll);
+					CourseModification.main(new String[]{"add",id,comboBoxTerm.getSelectedItem().toString(),comboBoxLocation.getSelectedItem().toString()},btnRefreshAll);
 				}
 				else
 					JOptionPane.showMessageDialog(null, "Please select a record first");
@@ -839,7 +846,7 @@ public class ChacoSwim extends JFrame {
 				int row = tableTerm.getSelectedRow();
 				if(row!=-1){
 					String id = tableTerm.getModel().getValueAt(row, 0).toString();
-					CourseModification.main(new String[]{"update",id,comboBoxTerm.getSelectedItem().toString()},btnRefreshAll);
+					CourseModification.main(new String[]{"update",id,comboBoxTerm.getSelectedItem().toString(),comboBoxLocation.getSelectedItem().toString()},btnRefreshAll);
 				}
 				else{
 					JOptionPane.showMessageDialog(null, "Please select a record from course table first");
@@ -870,7 +877,6 @@ public class ChacoSwim extends JFrame {
 						JOptionPane.showMessageDialog(null, "Deleted");
 						btnRefreshAll.doClick();
 					} catch (SQLException e) {
-						// TODO Auto-generated catch block
 						JOptionPane.showMessageDialog(null,"Line912: "+ e);
 					}
 				
@@ -886,7 +892,7 @@ public class ChacoSwim extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				refreshTable();
 				refreshTableTerm();
-				seatsLeft();
+				//seatsLeft();
 			}
 		});
 		
@@ -1719,7 +1725,6 @@ public class ChacoSwim extends JFrame {
 							
 							JOptionPane.showMessageDialog(null, "Finished");
 						} catch (IOException e1) {
-							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
 					}
@@ -1777,7 +1782,6 @@ public class ChacoSwim extends JFrame {
 								JOptionPane.showMessageDialog(null, "Finished");
 								
 							} catch (Exception e1) {
-								// TODO Auto-generated catch block
 								e1.printStackTrace();
 							}
 						}
@@ -1817,7 +1821,6 @@ public class ChacoSwim extends JFrame {
 
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
-				// TODO Auto-generated method stub
 				String str = list.getSelectedValue().toString();
 				switch(str){
 				case "Terms":

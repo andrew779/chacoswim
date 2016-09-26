@@ -42,6 +42,7 @@ public class CourseModification extends JFrame {
 	private static CourseModification frameCourse;
 	private static String id="";
 	private static String term="";
+	private static String location="";
 	private static String action = "";
 	private Connection conn=null;
 	private JComboBox<String> comboBoxDays,comboBoxCoach,comboBoxLine,comboBoxStart,comboBoxEnd;
@@ -64,12 +65,14 @@ public class CourseModification extends JFrame {
 						action=args[0];
 						id=args[1];
 						term=args[2];
+						location=args[3];
 						frameCourse.updateCourseInfo(id,term);
 					}
 					else if(args[0].equals("update")){
 						action=args[0];
 						id=args[1];
 						term=args[2];
+						location=args[3];
 						frameCourse.updateCourseInfo(id,term);
 					}
 				} catch (Exception e) {
@@ -152,7 +155,7 @@ public class CourseModification extends JFrame {
 	
 	public void updateCourseInfo(String id,String term){
 		try {
-			lblTerm.setText("Term: "+term);
+			lblTerm.setText("Term: "+term+"              Location: "+location);
 			if(action.equals("add")){
 				String query0 = "select * from students where sid = "+id;
 				PreparedStatement pst0 = conn.prepareStatement(query0);
@@ -347,7 +350,7 @@ public class CourseModification extends JFrame {
 		lblTerm = new JLabel("Term:");
 		lblTerm.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblTerm.setForeground(SystemColor.textHighlight);
-		lblTerm.setBounds(10, 37, 337, 23);
+		lblTerm.setBounds(10, 37, 602, 23);
 		panel.add(lblTerm);
 	}
 }
