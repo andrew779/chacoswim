@@ -73,6 +73,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.AbstractListModel;
+import net.miginfocom.swing.MigLayout;
 
 public class ChacoSwim extends JFrame {
 
@@ -129,6 +130,7 @@ public class ChacoSwim extends JFrame {
 	private JButton btnRefreshAll;
 	private JComboBox<String> comboBoxStaCoach;
 	private JToggleButton tglbtnSchedule;
+	private JComboBox<String> comboBoxLocation;
 	/**
 	 * Launch the application.
 	 */
@@ -165,30 +167,46 @@ public class ChacoSwim extends JFrame {
 	    } 
 	} 
 	
-	public String[] getTables(){
-		
+	public String[] getTables(String key){
+		List<String> list = new ArrayList<String>();
+		String query="";
 		try {
-			List<String> list = new ArrayList<String>();
-			String query="select name from sqlite_master where type='table' and name!='admin' and name!='duration' and name!='day_of_week' and name!='sqlite_sequence' and name!='coach' and name!='students' and name!='level';";
-			PreparedStatement pst=conn.prepareStatement(query);
-			ResultSet rs=pst.executeQuery();
-			while(rs.next()){
-				list.add(0,rs.getString("name"));
-			}
-			String[] str= new String[list.size()];
-			list.toArray(str);
-			pst.close();
-			rs.close();
-			
-			
-			
-			return str;
+			PreparedStatement pst=null;
+			ResultSet rs=null;
+			 
+			switch(key){
+			case "terms":
+				query = "Select name from "+key;
+				pst=conn.prepareStatement(query);
+				rs=pst.executeQuery();
+				while(rs.next()){
+					list.add(0,rs.getString("name"));
+				}
+				String[] str= new String[list.size()];
+				list.toArray(str);
+				pst.close();
+				rs.close();
+				return str;
+			case "location":
+				query = "Select name from "+key;
+				pst=conn.prepareStatement(query);
+				rs=pst.executeQuery();
+				while(rs.next()){
+					list.add(0,rs.getString("name"));
+				}
+				String[] location= new String[list.size()];
+				list.toArray(location);
+				pst.close();
+				rs.close();
+				return location;
+			}//switch
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
+		return null;
 	}
 	
 	//refreshing two tables----------------------------------------
@@ -239,17 +257,21 @@ public class ChacoSwim extends JFrame {
 	public void refreshTableTerm(){
 		ResultSet rs=null;
 		try{
-			String term = comboBoxTerm.getSelectedItem().toString();
+			DataBaseManage dbm = new DataBaseManage();
+			String termId = dbm.gotId("terms", comboBoxTerm.getSelectedItem().toString());
+			String locationId = dbm.gotId("location",comboBoxLocation.getSelectedItem().toString());
 			String day = comboBoxdays.getSelectedItem().toString();
 			String query="";
 			if(day.equals("All")){
-				query = "select t.ID, t.SID, s.FirstName, s.LastName, s.CurLevel, t.Day, t.Time, t.Line, t.Coach,s.cell from '"+term+"' t JOIN students s on s.sid = t.sid ORDER BY t.day, t.time";
+				query = "select * from active_record where termID = ? AND locationID = ?";
+				
 			}
 			else{
-				query = "select t.ID, t.SID, s.FirstName, s.LastName, s.CurLevel, t.day, t.time, t.line, t.coach,s.cell from '"+term+"' t JOIN students s on s.sid = t.sid WHERE t.day = '"+day+ 
-					"' ORDER BY t.day, t.time";
+				query = "select * from active_record where termID = ? AND locationID = ? AND day = "+day;
 				}
 			PreparedStatement pst=conn.prepareStatement(query);
+			pst.setString(1, termId);
+			pst.setString(2, locationId);
 			rs = pst.executeQuery();
 			tableTerm.setModel(DbUtils.resultSetToTableModel(rs));
 			//comboBoxEmailTerm.setModel(DbUtils.resultSetToTableModel(rs));
@@ -637,7 +659,7 @@ public class ChacoSwim extends JFrame {
 			}
 		});
 		comboBoxdays.setModel(new DefaultComboBoxModel<Object>(new String[] {"All", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"}));
-		comboBoxdays.setBounds(102, 314, 119, 20);
+		comboBoxdays.setBounds(335, 314, 119, 20);
 		panel.add(comboBoxdays);
 		
 		JButton btnAdd = new JButton("Add");
@@ -713,80 +735,17 @@ public class ChacoSwim extends JFrame {
 				refreshTableTerm();
 			}
 		});
-		comboBoxTerm.setModel(new DefaultComboBoxModel<Object>(getTables()));
-		comboBoxTerm.setBounds(68, 283, 176, 20);
+		comboBoxTerm.setModel(new DefaultComboBoxModel<Object>(getTables("terms")));
+		comboBoxTerm.setBounds(20, 314, 119, 20);
 		
 		panel.add(comboBoxTerm);
 		
 		JLabel lblSelectTerm = new JLabel("Term:");
-		lblSelectTerm.setBounds(20, 283, 117, 20);
+		lblSelectTerm.setBounds(20, 290, 117, 20);
 		panel.add(lblSelectTerm);
 		
-		JButton btnNewTerm = new JButton("New Term");
-		btnNewTerm.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				String name ="";
-				name = JOptionPane.showInputDialog("Enter a name for the new term: (ex. 2016Fall_Location)");
-				if(!name.isEmpty()&&name!=null){
-					int ans = JOptionPane.showConfirmDialog(null, "Are you sure you want to create the new term: "+name,"Comfirmation",JOptionPane.YES_NO_OPTION);
-					if (ans == JOptionPane.YES_OPTION){
-						try {
-							String query = "CREATE TABLE 'main' .'"+name+"'('id' INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL  UNIQUE , 'sid' INTEGER NOT NULL, 'day' TEXT NOT NULL, 'time' TEXT NOT NULL, 'line' INTEGER , 'coach' TEXT)";
-							PreparedStatement pst=conn.prepareStatement(query);
-							
-							pst.execute();
-							pst.close();
-							comboBoxTerm.setModel(new DefaultComboBoxModel<Object>(getTables()));
-							comboBoxEmailTerm.setModel(new DefaultComboBoxModel<String>(getTables()));
-							comboBoxStaTerm.setModel(new DefaultComboBoxModel<String>(getTables()));
-							comboBoxExTerm.setModel(new DefaultComboBoxModel<String>(getTables()));
-							btnRefreshAll.doClick();
-						} catch (SQLException e) {
-							// TODO Auto-generated catch block
-							JOptionPane.showMessageDialog(null, "Line743: "+e);
-						}
-						
-					}
-				}
-			}
-		});
-		
-		btnNewTerm.setIcon(new ImageIcon(new ImageIcon(this.getClass().getResource("/24newterm.png")).getImage()));
-		btnNewTerm.setBounds(296, 282, 129, 23);
-		panel.add(btnNewTerm);
-		
-		JButton btnDeleteTerm = new JButton("Delete Term");
-		btnDeleteTerm.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				String name = comboBoxTerm.getSelectedItem().toString();
-				int ans = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete "+name, "Comfirmation", JOptionPane.YES_OPTION);
-				if (ans==JOptionPane.YES_OPTION){
-					try {
-						String query = "DROP TABLE 'main'.'"+name+"';";
-						PreparedStatement pst=conn.prepareStatement(query);
-						
-						pst.execute();
-						pst.close();
-						JOptionPane.showMessageDialog(null, name+" Deleted");
-						comboBoxTerm.setModel(new DefaultComboBoxModel<Object>(getTables()));
-						comboBoxEmailTerm.setModel(new DefaultComboBoxModel<String>(getTables()));
-						comboBoxStaTerm.setModel(new DefaultComboBoxModel<String>(getTables()));
-						comboBoxExTerm.setModel(new DefaultComboBoxModel<String>(getTables()));
-						btnRefreshAll.doClick();
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						JOptionPane.showMessageDialog(null,"Line775: "+ e);
-					}
-				}
-			}
-		});
-		
-		btnDeleteTerm.setIcon(new ImageIcon(new ImageIcon(this.getClass().getResource("/24delete.png")).getImage()));
-		btnDeleteTerm.setBounds(448, 282, 129, 23);
-		panel.add(btnDeleteTerm);
-		
 		JLabel lblCourseInfo = new JLabel("Course Info: ");
-		lblCourseInfo.setBounds(20, 345, 117, 20);
+		lblCourseInfo.setBounds(20, 356, 117, 20);
 		panel.add(lblCourseInfo);
 		
 		JScrollPane scrollPane_3 = new JScrollPane();
@@ -870,8 +829,8 @@ public class ChacoSwim extends JFrame {
 		//tableTerm.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		//resizeColumnWidth(tableTerm);
 		
-		JLabel lblByDay = new JLabel("By day:");
-		lblByDay.setBounds(20, 317, 46, 14);
+		JLabel lblByDay = new JLabel("Day:");
+		lblByDay.setBounds(335, 293, 46, 14);
 		panel.add(lblByDay);
 		
 		JButton btnEdit = new JButton("Edit");
@@ -995,6 +954,16 @@ public class ChacoSwim extends JFrame {
 		btnLevelup.setIcon(new ImageIcon(new ImageIcon(this.getClass().getResource("/24check.png")).getImage()));
 		btnLevelup.setBounds(448, 23, 129, 25);
 		panel.add(btnLevelup);
+		
+		JLabel lblLocation = new JLabel("Location:");
+		lblLocation.setBounds(176, 293, 64, 14);
+		panel.add(lblLocation);
+		
+		comboBoxLocation = new JComboBox<String>();
+		comboBoxLocation.setModel(new DefaultComboBoxModel<String>(getTables("location")));
+		//TODO
+		comboBoxLocation.setBounds(176, 314, 129, 20);
+		panel.add(comboBoxLocation);
 		
 		
 //Start Tab Coach~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1314,7 +1283,7 @@ public class ChacoSwim extends JFrame {
 		
 		comboBoxEmailTerm = new JComboBox<String>();
 		comboBoxEmailTerm.setBounds(217, 159, 183, 23);
-		comboBoxEmailTerm.setModel(new DefaultComboBoxModel<String>(getTables()));
+		comboBoxEmailTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
 		EmailTab.add(comboBoxEmailTerm);
 		
 		comboBoxEmailDay = new JComboBox<String>();
@@ -1488,7 +1457,7 @@ public class ChacoSwim extends JFrame {
 			}
 		});
 		comboBoxStaTerm.setBounds(311, 129, 178, 23);
-		comboBoxStaTerm.setModel(new DefaultComboBoxModel<String>(getTables()));
+		comboBoxStaTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
 		StatisticsTab.add(comboBoxStaTerm);
 		
 		btnMonday = new JButton("Monday:");
@@ -1682,7 +1651,7 @@ public class ChacoSwim extends JFrame {
 				refreshExTableTerm();
 			}
 		});
-		comboBoxExTerm.setModel(new DefaultComboBoxModel<String>(getTables()));
+		comboBoxExTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
 		comboBoxExTerm.setBounds(981, 89, 175, 23);
 		Export.add(comboBoxExTerm);
 		
@@ -1799,10 +1768,10 @@ public class ChacoSwim extends JFrame {
 								os.flush();
 								os.close();
 								
-								comboBoxTerm.setModel(new DefaultComboBoxModel<Object>(getTables()));
-								comboBoxEmailTerm.setModel(new DefaultComboBoxModel<String>(getTables()));
-								comboBoxStaTerm.setModel(new DefaultComboBoxModel<String>(getTables()));
-								comboBoxExTerm.setModel(new DefaultComboBoxModel<String>(getTables()));
+								comboBoxTerm.setModel(new DefaultComboBoxModel<Object>(getTables("terms")));
+								comboBoxEmailTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
+								comboBoxStaTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
+								comboBoxExTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
 								comboBoxStaCoach.setModel(new DefaultComboBoxModel<String>(new StatisticMethod().getCoaches()));
 								new TabCoaches(jtCoaches).refreshTable();
 								JOptionPane.showMessageDialog(null, "Finished");
@@ -1823,14 +1792,14 @@ public class ChacoSwim extends JFrame {
 		btnImportSqliteFile.setBounds(646, 441, 153, 33);
 		Export.add(btnImportSqliteFile);
 		
-		JPanel Variables = new JPanel();
-		tabbedPane.addTab("Settings", null, Variables, null);
-		Variables.setLayout(null);
+		JPanel SettingTab = new JPanel();
+		tabbedPane.addTab("Settings", null, SettingTab, null);
+		SettingTab.setLayout(null);
 		
 		JSplitPane splitPane = new JSplitPane();
 		splitPane.setResizeWeight(0.15);
 		splitPane.setBounds(0, 0, 1269, 701);
-		Variables.add(splitPane);
+		SettingTab.add(splitPane);
 		
 		JList list = new JList();
 		list.setModel(new AbstractListModel() {
@@ -1843,15 +1812,35 @@ public class ChacoSwim extends JFrame {
 			}
 		});
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		splitPane.setLeftComponent(list);
 		
+		list.addListSelectionListener(new ListSelectionListener(){
+
+			@Override
+			public void valueChanged(ListSelectionEvent arg0) {
+				// TODO Auto-generated method stub
+				String str = list.getSelectedValue().toString();
+				switch(str){
+				case "Terms":
+					/* Set right pane for terms */
+					splitPane.setRightComponent(new SettingPane().getTerms());
+					break;
+				case "Locations":
+					splitPane.setRightComponent(new SettingPane().getLocations());
+					break;
+				default:
+					break;
+				}
+			}
+			
+		});
+		
+		splitPane.setLeftComponent(list);
+		splitPane.setRightComponent(new SettingPane().getTerms());
 		
 		
 
-/* Set right pane for terms */
-		JPanel p = new JPanel(new BorderLayout());
-		p.add(new SettingPane().getTerms(), BorderLayout.CENTER);
-		splitPane.setRightComponent(p);
+
+/* Set right pane for locations */	
 		
 		
 //		refreshTable();
