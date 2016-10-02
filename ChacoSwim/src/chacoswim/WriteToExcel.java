@@ -103,11 +103,17 @@ public class WriteToExcel {
 			String query="";
 			if(day.equals("All")){
 				query = "select t.ID, t.SID, s.FirstName, s.LastName, s.CurLevel, t.Day, t.Time, t.Line, t.Coach from '"+term+"' t JOIN students s on s.sid = t.sid ORDER BY t.day, t.time, t.line, s.CurLevel";
+				
 			}
 			else{
-				query = "select t.sid, s.FirstName, s.LastName, s.CurLevel, t.day, t.time, t.line, t.coach from '"+term+"' t JOIN students s on s.sid = t.sid WHERE t.day = '"+day+ 
-					"' ORDER BY t.day, t.time, t.line, s.CurLevel";
-				}
+				//query = "select t.sid, s.FirstName, s.LastName, s.CurLevel, t.day, t.time, t.line, t.coach from '"+term+"' t JOIN students s on s.sid = t.sid WHERE t.day = '"+day+ 
+				//	"' ORDER BY t.day, t.time, t.line, s.CurLevel";
+				query = "select a.sid, s.firstName, s.lastName, level.name as CurLevel, a.day, a.time, a.line, c.name as Coach from"
+						+" active_record a JOIN students s ON s.sid=a.sid"
+						+" JOIN level ON a.levelID = level.id"
+						+" JOIN coach c ON a.coachID = c.id"
+						+" WHERE a.day = '"+day+"'";
+			}
 			PreparedStatement pst=conn.prepareStatement(query);
 			rs = pst.executeQuery();
 			
