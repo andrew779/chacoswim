@@ -262,20 +262,22 @@ public class ChacoSwim extends JFrame {
 			String day = comboBoxdays.getSelectedItem().toString();
 			String query="";
 			if(day.equals("All")){
-				query = "select a.id,s.SID,s.FirstName,s.LastName,s.CurLevel,a.Time as Time,c.name as Coach,a.Line as Line,A.Day as Day from active_record a"
+				query = "select a.id,s.SID,s.FirstName,s.LastName,level.name as Level,a.Time as Time,c.name as Coach,a.Line as Line,A.Day as Day from active_record a"
 						+ " INNER JOIN students s ON s.sid=a.sid"
 						+ " INNER JOIN terms t ON t.id = a.termID"
 						+ " INNER JOIN location l ON l.id = a.locationID"
 						+ " INNER JOIN coach c ON c.id = a.coachID"
+						+ " INNER JOIN level ON level.id = a.levelID"
 						+ " where termID = ? AND locationID = ?";
 				
 			}
 			else{
-				query = "select a.id,s.SID,s.FirstName,s.LastName,s.CurLevel,a.Time as Time,c.name as Coach,a.Line as Line, s.Cell from active_record a"
+				query = "select a.id,s.SID,s.FirstName,s.LastName,level.name as Level,a.Time as Time,c.name as Coach,a.Line as Line, s.Cell from active_record a"
 						+ " INNER JOIN students s ON s.sid=a.sid"
 						+ " INNER JOIN terms t ON t.id = a.termID"
 						+ " INNER JOIN location l ON l.id = a.locationID"
 						+ " INNER JOIN coach c ON c.id = a.coachID"
+						+ " INNER JOIN level ON level.id = a.levelID"
 						+ " where termID = ? AND locationID = ? AND day = '"+day+"'";
 				}
 			PreparedStatement pst=conn.prepareStatement(query);
@@ -699,6 +701,24 @@ public class ChacoSwim extends JFrame {
 		btnDeleteStudent.setBounds(149, 23, 129, 25);
 		panel.add(btnDeleteStudent);
 		
+		JButton btnEdit = new JButton("Edit");
+		btnEdit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				int row = tableTerm.getSelectedRow();
+				if(row!=-1){
+					String id = tableTerm.getModel().getValueAt(row, 0).toString();
+					CourseModification.main(new String[]{"update",id,comboBoxTerm.getSelectedItem().toString(),comboBoxLocation.getSelectedItem().toString()},btnRefreshAll);
+				}
+				else{
+					JOptionPane.showMessageDialog(null, "Please select a record from course table first");
+				}
+			}
+		});
+		
+		btnEdit.setIcon(new ImageIcon(new ImageIcon(this.getClass().getResource("/24magicwand.png")).getImage()));
+		btnEdit.setBounds(248, 583, 119, 30);
+		panel.add(btnEdit);
+		
 		JButton btnEditStudent = new JButton("Edit");
 		btnEditStudent.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -840,23 +860,7 @@ public class ChacoSwim extends JFrame {
 		lblByDay.setBounds(335, 293, 46, 14);
 		panel.add(lblByDay);
 		
-		JButton btnEdit = new JButton("Edit");
-		btnEdit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				int row = tableTerm.getSelectedRow();
-				if(row!=-1){
-					String id = tableTerm.getModel().getValueAt(row, 0).toString();
-					CourseModification.main(new String[]{"update",id,comboBoxTerm.getSelectedItem().toString(),comboBoxLocation.getSelectedItem().toString()},btnRefreshAll);
-				}
-				else{
-					JOptionPane.showMessageDialog(null, "Please select a record from course table first");
-				}
-			}
-		});
 		
-		btnEdit.setIcon(new ImageIcon(new ImageIcon(this.getClass().getResource("/24magicwand.png")).getImage()));
-		btnEdit.setBounds(248, 583, 119, 30);
-		panel.add(btnEdit);
 		
 		JButton btnDelete = new JButton("Delete");
 		btnDelete.setIcon(new ImageIcon(new ImageIcon(this.getClass().getResource("/24delete.png")).getImage()));
@@ -864,7 +868,7 @@ public class ChacoSwim extends JFrame {
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String term = comboBoxTerm.getSelectedItem().toString();
-				String query = "DELETE FROM '"+term+"' WHERE ID = ?;";
+				String query = "DELETE FROM 'active_record' WHERE ID = ?;";
 				int row = tableTerm.getSelectedRow();
 				String id = tableTerm.getModel().getValueAt(row, 0).toString();
 				int ans = JOptionPane.showConfirmDialog(null, "Do you really want to delete selected record","Deleting",JOptionPane.YES_NO_OPTION);
@@ -967,7 +971,11 @@ public class ChacoSwim extends JFrame {
 		
 		comboBoxLocation = new JComboBox<String>();
 		comboBoxLocation.setModel(new DefaultComboBoxModel<String>(getTables("location")));
-		//TODO
+		comboBoxLocation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				refreshTableTerm();
+			}
+		});
 		comboBoxLocation.setBounds(176, 314, 129, 20);
 		panel.add(comboBoxLocation);
 		

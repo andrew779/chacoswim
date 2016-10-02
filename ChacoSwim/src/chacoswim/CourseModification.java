@@ -27,6 +27,8 @@ import javax.swing.ImageIcon;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.SystemColor;
+import javax.swing.ComboBoxModel;
+import javax.swing.JSeparator;
 
 public class CourseModification extends JFrame {
 
@@ -48,6 +50,9 @@ public class CourseModification extends JFrame {
 	private JComboBox<String> comboBoxDays,comboBoxCoach,comboBoxLine,comboBoxStart,comboBoxEnd;
 	private DefaultComboBoxModel<String> modelDays,modelCoach,modelLine,modelStart,modelEnd;
 	private static JButton jbtn2;
+	private JTextField tfAmount;
+	private JComboBox<String> comboBoxPay;
+	private DefaultComboBoxModel<String> modelPay;
 	/**
 	 * Launch the application.
 	 */
@@ -81,7 +86,10 @@ public class CourseModification extends JFrame {
 			}
 		});
 	}
-	
+	/**
+	 * TODO get coachName
+	 * @return
+	 */
 	public String[] getCoach(){
 		try {
 			List<String> list = new ArrayList<String>();
@@ -98,29 +106,34 @@ public class CourseModification extends JFrame {
 			return str;
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
 	}
 	
+	
+	/**
+	 * TODO UpdateNew Info
+	 */
 	public void updateNew(){
 		try {
-			String query = "select * from '"+term+"' where id = ?";
+			String query = "select * from 'active_record' where id = ?";
 			PreparedStatement pst = conn.prepareStatement(query);
 			pst.setString(1, id);
 			ResultSet rs = pst.executeQuery();
 			//if true, use update .
 			if(rs.next()){
-				String update="UPDATE 'main'.'"+term+"' SET 'day' = ?, 'time' = ?, 'line' = ?, 'coach' = ? WHERE  ID = "+id;
+				String update="UPDATE 'main'.'active_record' SET 'day' = ?, 'time' = ?, 'line' = ?, 'coachID' = ?,'payment_method' = ?,'amount' =  ? WHERE  id = "+id;
 				PreparedStatement pstUp = conn.prepareStatement(update);
 				pstUp.setString(1, comboBoxDays.getSelectedItem().toString());
 				String time = comboBoxStart.getSelectedItem().toString()+"-"+comboBoxEnd.getSelectedItem().toString();
 				pstUp.setString(2, time);
 				pstUp.setString(3, comboBoxLine.getSelectedItem().toString());
-				pstUp.setString(4, comboBoxCoach.getSelectedItem().toString());
+				String coachID = new DataBaseManage().gotId("coach", comboBoxCoach.getSelectedItem().toString());
+				pstUp.setString(4, coachID);
+				pstUp.setString(5, comboBoxPay.getSelectedItem().toString());
+				pstUp.setString(6, tfAmount.getText());
 				pstUp.execute();
-				JOptionPane.showMessageDialog(null, "updated");
 				pstUp.close();
 				rs.close();
 			}
@@ -128,27 +141,33 @@ public class CourseModification extends JFrame {
 			else
 				JOptionPane.showMessageDialog(null, "No existing record");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(null, e);
 		}
 	}
 	
+	/**
+	 * TODO addNew record
+	 */
 	public void addNew(){
-		String query="INSERT INTO 'main'.'"+term+"' ('sid','day','time','line','coach') VALUES (?1,?2,?3,?4,?5)";
+		String query="INSERT INTO 'main'.'active_record' ('termID','sid','locationID','day','time','line','coachID','levelID','payment_method','amount') VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10)";
 		try {
 			PreparedStatement pst = conn.prepareStatement(query);
-			pst.setString(1,tfSID.getText().toString());
-			pst.setString(2, comboBoxDays.getSelectedItem().toString());
+			DataBaseManage dbm = new DataBaseManage();
+			pst.setString(1, dbm.gotId("terms", term));
+			pst.setString(2,tfSID.getText().toString());
+			pst.setString(3, dbm.gotId("location", location));
+			pst.setString(4, comboBoxDays.getSelectedItem().toString());
 			String time = comboBoxStart.getSelectedItem().toString()+"-"+comboBoxEnd.getSelectedItem().toString();
-			pst.setString(3, time);
-			pst.setString(4, comboBoxLine.getSelectedItem().toString());
-			pst.setString(5, comboBoxCoach.getSelectedItem().toString());
+			pst.setString(5, time);
+			pst.setString(6, comboBoxLine.getSelectedItem().toString());
+			pst.setString(7,dbm.gotId("coach", comboBoxCoach.getSelectedItem().toString()));
+			pst.setString(8, dbm.gotId("level", dbm.getCurLevel(tfSID.getText().toString())));
+			pst.setString(9, comboBoxLine.getSelectedItem().toString());
+			pst.setString(10, tfAmount.getText());
 			pst.execute();
-			//JOptionPane.showMessageDialog(null, "New record added.");
 			
 			pst.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(null, e);
 		}
 	}
@@ -167,9 +186,10 @@ public class CourseModification extends JFrame {
 				pst0.close();
 			}
 			else if(action.equals("update")){
-				String query = "select t.id, s.sid, s.firstname, s.lastname, t.day, t.time, t.coach, t.line from '"+term+"' t JOIN students s on s.sid=t.sid where t.id= ?;";
+				String query = "select a.id, s.sid, s.firstname, s.lastname, a.day, a.time, c.name as coach, a.line, a.payment_method, a.amount"
+						+" FROM active_record a JOIN students s ON a.sid=s.sid"+
+						" JOIN coach c ON a.coachID=c.id WHERE a.id = "+id;
 				PreparedStatement pst = conn.prepareStatement(query);
-				pst.setString(1, id);
 				ResultSet rs = pst.executeQuery();
 				
 				if(rs.next()){
@@ -179,6 +199,8 @@ public class CourseModification extends JFrame {
 					String timeEnd = time.substring(6);
 					String line = rs.getString("line").toString();
 					String coach = rs.getString("coach").toString();
+					String pay = rs.getString("payment_method").toString();
+					String amount = rs.getString("amount").toString();
 					
 					tfSID.setText(rs.getString("sid"));
 					textFieldFirstName.setText(rs.getString("firstname"));
@@ -199,13 +221,17 @@ public class CourseModification extends JFrame {
 					if(modelCoach.getIndexOf(coach)!=-1){
 						comboBoxCoach.setSelectedItem(coach);
 					}
+					if(modelPay.getIndexOf(pay)!=-1){
+						comboBoxPay.setSelectedItem("pay");
+					}
+					tfAmount.setText(amount);
+					
 				}
 					
 				rs.close();
 				pst.close();
 			}
 		}catch (Exception e) {
-			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(null, e);
 		}
 	}
@@ -322,7 +348,9 @@ public class CourseModification extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				if(action.equals("update")){
 					updateNew();
+					JOptionPane.showMessageDialog(null, "Updated");
 					jbtn2.doClick();
+					frameCourse.dispose();
 				}
 				else if (action.equals("add")){
 					addNew();
@@ -352,5 +380,27 @@ public class CourseModification extends JFrame {
 		lblTerm.setForeground(SystemColor.textHighlight);
 		lblTerm.setBounds(10, 37, 602, 23);
 		panel.add(lblTerm);
+		
+		JLabel lblPay = new JLabel("Payment:");
+		lblPay.setBounds(57, 299, 66, 19);
+		panel.add(lblPay);
+		
+		modelPay = new DefaultComboBoxModel<String>(new String[] {"Unpaid", "Cash", "Cheque", "EMT", "CreditCard", "BankDraft", "N/A"});
+		comboBoxPay = new JComboBox<String>(modelPay);
+		comboBoxPay.setBounds(133, 298, 103, 20);
+		panel.add(comboBoxPay);
+		
+		JLabel lblAmount = new JLabel("Amount:");
+		lblAmount.setBounds(358, 301, 66, 19);
+		panel.add(lblAmount);
+		
+		tfAmount = new JTextField();
+		tfAmount.setBounds(434, 298, 103, 20);
+		panel.add(tfAmount);
+		tfAmount.setColumns(10);
+		
+		JSeparator separator = new JSeparator();
+		separator.setBounds(10, 283, 602, 2);
+		panel.add(separator);
 	}
 }
