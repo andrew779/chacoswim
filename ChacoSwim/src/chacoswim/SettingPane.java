@@ -49,7 +49,7 @@ public class SettingPane implements ActionListener{
 				rs=pst.executeQuery();
 				table.setModel(DbUtils.resultSetToTableModel(rs));
 			}
-			else if(request.equals("locations")){
+			else if(request.equals("location")){
 				String query = "select * from location ORDER BY id DESC";
 				pst=conn.prepareStatement(query);
 				rs=pst.executeQuery();
@@ -66,10 +66,10 @@ public class SettingPane implements ActionListener{
 	}
 	
 	private void manage(String key,String ...para){
-		Connection conn=sqliteConnection.dbConnector();
-		PreparedStatement pst=null;
-		String name,type,id,query;
 		try{
+			Connection conn=sqliteConnection.dbConnector();
+			PreparedStatement pst=null;
+			String name,type,id,add,pho,query;
 			switch(key){
 			case "termsAdd":
 				name = para[0];
@@ -98,7 +98,39 @@ public class SettingPane implements ActionListener{
 				pst.setString(1, id);
 				pst.execute();
 				break;
-				
+			case "locationAdd":
+				name = para[0];
+				add = para[1];
+				pho = para[2];
+				query = "INSERT INTO location (name,address,phone) VALUES (?,?,?)";
+				pst = conn.prepareStatement(query);
+				pst.setString(1, name);
+				pst.setString(2, add);
+				pst.setString(3, pho);
+				pst.execute();
+				break;
+			case "locationUpdate":
+				name = para[0];
+				add = para[1];
+				pho = para[2];
+				id = para[3];
+				query = "UPDATE location SET name = ?, address = ?, phone = ? WHERE id = ?";
+				pst = conn.prepareStatement(query);
+				pst.setString(1, name);
+				pst.setString(2, add);
+				pst.setString(3, pho);
+				pst.setString(4, id);
+				pst.execute();
+				break;
+			case "locationDelete":
+				id = para[0];
+				query = "DELETE FROM location WHERE id = ?";
+				pst=conn.prepareStatement(query);
+				pst.setString(1, id);
+				pst.execute();
+				break;
+				default:
+					JOptionPane.showMessageDialog(null, "No such case: "+key);
 			}//switch
 			pst.close();
 			conn.close();
@@ -207,7 +239,7 @@ public class SettingPane implements ActionListener{
 		//create elements for p
 		JTable table = new JTable();
 		JScrollPane scrollPane = new JScrollPane(table);
-		fillTable(table,"locations");
+		fillTable(table,"location");
 		//add table
 		p.add(scrollPane,"span, wrap");
 		
@@ -233,6 +265,59 @@ public class SettingPane implements ActionListener{
 		p.add(locationsAdd,"skip, split 3, width 70");
 		p.add(locationsUpdate,"width 70");
 		p.add(locationsDelete,"width 70, wrap");
+		
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				int row = table.getSelectedRow();
+				if(row!=-1){
+					tfname.setText(table.getValueAt(row, 1).toString());
+					tfadd.setText(table.getValueAt(row, 2).toString());
+					tfpho.setText(table.getValueAt(row, 2).toString());
+				}
+			}
+		});
+		
+		locationsAdd.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				manage("locationAdd",tfname.getText(),tfadd.getText(),tfpho.getText());
+				JOptionPane.showMessageDialog(null, "Done");
+				fillTable(table,"location");
+			}
+		});
+		locationsUpdate.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				int row = table.getSelectedRow();
+				if(row!=-1){
+					String id = table.getValueAt(row, 0).toString();
+					manage("locationUpdate",tfname.getText(),tfadd.getText(),tfpho.getText(),id);
+					JOptionPane.showMessageDialog(null, "Done");
+					fillTable(table,"location");
+				}
+				else JOptionPane.showMessageDialog(null, "Select a valid row from table first");
+			}
+		});
+		locationsDelete.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				int row = table.getSelectedRow();
+				if(row!=-1){
+					String id = table.getValueAt(row, 0).toString();
+					manage("locationDelete",id);
+					JOptionPane.showMessageDialog(null, "Done");
+					fillTable(table,"location");
+				}
+				else JOptionPane.showMessageDialog(null, "Select a valid row from table first");
+			}
+		});
 		
 		panel.add(p);
 		return panel;

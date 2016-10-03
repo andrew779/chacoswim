@@ -51,8 +51,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -73,6 +76,8 @@ import javax.swing.JToggleButton;
 import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.AbstractListModel;
+import javax.swing.BorderFactory;
+
 import net.miginfocom.swing.MigLayout;
 
 public class ChacoSwim extends JFrame {
@@ -131,6 +136,8 @@ public class ChacoSwim extends JFrame {
 	private JComboBox<String> comboBoxStaCoach;
 	private JToggleButton tglbtnSchedule;
 	private JComboBox<String> comboBoxLocation;
+	private JComboBox<String> comboBoxExLoc;
+	private JComboBox<String> comboBoxEmailLoc;
 	/**
 	 * Launch the application.
 	 */
@@ -230,13 +237,21 @@ public class ChacoSwim extends JFrame {
 		try{
 			String term = comboBoxExTerm.getSelectedItem().toString();
 			String day = comboBoxExDay.getSelectedItem().toString();
+			String location = comboBoxExLoc.getSelectedItem().toString();
 			String query="";
 			if(day.equals("All")){
 				query = "select t.ID, t.SID, s.FirstName, s.LastName, s.CurLevel, t.Day, t.Time, t.Line, t.Coach from '"+term+"' t JOIN students s on s.sid = t.sid ORDER BY t.day, t.time, t.line, s.CurLevel";
 			}
 			else{
-				query = "select t.sid, s.FirstName, s.LastName, s.CurLevel, t.day, t.time, t.line, t.coach from '"+term+"' t JOIN students s on s.sid = t.sid WHERE t.day = '"+day+ 
-					"' ORDER BY t.day, t.time, t.line, s.CurLevel";
+				DataBaseManage dbm = new DataBaseManage();
+				String termID = dbm.gotId("terms", term);
+				String locationID = dbm.gotId("location", location);
+				query = "select a.sid, s.firstName, s.lastName, level.name as CurLevel, a.day, a.time, a.line, c.name as Coach from"
+						+" active_record a JOIN students s ON s.sid=a.sid"
+						+" JOIN level ON a.levelID = level.id"
+						+" JOIN coach c ON a.coachID = c.id"
+						+" WHERE a.day = '"+day+"' AND a.termID = '"+termID+"' AND a.locationID = '"+locationID+"'"
+						+" ORDER BY a.day, a.time, a.line, level.name";
 				}
 			PreparedStatement pst=conn.prepareStatement(query);
 			rs = pst.executeQuery();
@@ -532,6 +547,7 @@ public class ChacoSwim extends JFrame {
 	public String[] getRecipient(){
 		List<String> address = new ArrayList<String>();
 		String term = "";
+		String location = "";
 		String day = "";
 		String query="";
 		PreparedStatement pst;
@@ -557,8 +573,14 @@ public class ChacoSwim extends JFrame {
 			else{
 				term = comboBoxEmailTerm.getSelectedItem().toString();
 				day = comboBoxEmailDay.getSelectedItem().toString();
-				if(day.equals("All"))query="select s.email from '"+term+"' t JOIN students s ON s.sid=t.sid";
-				else query="select s.email from '"+term+"' t JOIN students s ON s.sid=t.sid WHERE t.day='"+day+"' and s.email LIKE '%@%'";
+				location = comboBoxEmailLoc.getSelectedItem().toString();
+				DataBaseManage dbm = new DataBaseManage();
+				String termID = dbm.gotId("terms", term);
+				String locationID = dbm.gotId("location", location);
+				if(day.equals("All"))query="select s.email from 'active_record' a JOIN students s ON s.sid=a.sid WHERE a.termID = "+termID+" AND a.locationID = "+locationID+
+						" and s.email LIKE '%@%'";
+				else query="select s.email from 'active_record' a JOIN students s ON s.sid=a.sid WHERE a.day='"+day+"' AND a.termID = "+termID+" AND a.locationID = "+locationID+
+						" and s.email LIKE '%@%'";
 				pst=conn.prepareStatement(query);
 				rs=pst.executeQuery();
 				while(rs.next())address.add(rs.getString("email"));
@@ -620,7 +642,7 @@ public class ChacoSwim extends JFrame {
 		
 		//table event listener
 		table = new JTable();
-		
+		table.setAutoCreateRowSorter(true);
 		
 		
 		table.addMouseListener(new MouseAdapter() {
@@ -852,6 +874,7 @@ public class ChacoSwim extends JFrame {
 		panel.add(scrollPane_1);
 		
 		tableTerm = new JTable();
+		tableTerm.setAutoCreateRowSorter(true);
 		scrollPane_1.setViewportView(tableTerm);
 		//tableTerm.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		//resizeColumnWidth(tableTerm);
@@ -978,7 +1001,47 @@ public class ChacoSwim extends JFrame {
 		});
 		comboBoxLocation.setBounds(176, 314, 129, 20);
 		panel.add(comboBoxLocation);
+
+//Start Students Tab-----------------------TODO StudentTab
+		JPanel StudentsTab = new JPanel();
+		tabbedPane.addTab("Students", null, StudentsTab, null);
+		StudentsTab.setLayout(new MigLayout("", "[grow]", "[]"));
 		
+		JPanel panelSt = new JPanel();
+		panelSt.setBorder(BorderFactory.createTitledBorder("Students"));
+		panelSt.setLayout(new MigLayout("", "[grow][]", ""));
+		
+		panelSt.add(new JLabel("Search By: "),"left,split 2");
+		
+		JComboBox comboBox = new JComboBox();
+		comboBox.setModel(new DefaultComboBoxModel(new String[] {"aaaaaaaa", "bbbbbbbbb", "ccccccccc"}));
+		panelSt.add(comboBox, "gapleft 10,wrap");
+		
+		panelSt.add(new JTextField("Enter Here"),"width 150,gaptop 5,wrap");
+		
+		JScrollPane scrollPane_10 = new JScrollPane();
+		panelSt.add(scrollPane_10, "w 200:1000:,h 100:200:,grow");
+		JTable jtStudents = new JTable();
+		scrollPane_10.setViewportView(jtStudents);
+		jtStudents.setFillsViewportHeight(true);
+		jtStudents.setModel(new DefaultTableModel());
+		
+		StudentsTab.add(panelSt, "cell 0 0,grow");
+		/*
+		
+		
+		
+		panelSt.add(new JButton("Term"),"flowy,cell 1 0,sizegroupx 1,sizegroupy 1,aligny top");
+		panelSt.add(new JButton("Location"),"cell 1 0,sizegroupx 1,sizegroupy 1");
+		panelSt.add(new JButton("Day"),"cell 1 0,sizegroupx 1,sizegroupy 1");
+		
+		
+		
+		JLabel lblSearchBy_1 = new JLabel("Search by: ");
+		panelSt.add(lblSearchBy_1, "flowx,cell 0 1");
+		*/
+		
+//End Students Tab------------------------		
 		
 //Start Tab Coach~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		JPanel CoachTab = new JPanel();
@@ -1235,6 +1298,7 @@ public class ChacoSwim extends JFrame {
 				rdbtnAllCoaches.setEnabled(false);
 				comboBoxEmailTerm.setEnabled(false);
 				comboBoxEmailDay.setEnabled(false);
+				comboBoxEmailLoc.setEnabled(false);
 			}
 		});
 		rdbtnSingleRecipient.setSelected(true);
@@ -1266,6 +1330,7 @@ public class ChacoSwim extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				comboBoxEmailTerm.setEnabled(false);
 				comboBoxEmailDay.setEnabled(false);
+				comboBoxEmailLoc.setEnabled(false);
 			}
 		});
 		buttonGroup_1.add(rdbtnAllCoaches);
@@ -1277,6 +1342,7 @@ public class ChacoSwim extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				comboBoxEmailTerm.setEnabled(true);
 				comboBoxEmailDay.setEnabled(true);
+				comboBoxEmailLoc.setEnabled(true);
 			}
 		});
 		buttonGroup_1.add(rdbtnStudents);
@@ -1300,9 +1366,14 @@ public class ChacoSwim extends JFrame {
 		comboBoxEmailTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
 		EmailTab.add(comboBoxEmailTerm);
 		
+		comboBoxEmailLoc = new JComboBox<String>(new DefaultComboBoxModel<String>(getTables("location")));
+		comboBoxEmailLoc.setEnabled(false);
+		comboBoxEmailLoc.setBounds(217, 193, 183, 23);
+		EmailTab.add(comboBoxEmailLoc);
+		
 		comboBoxEmailDay = new JComboBox<String>();
 		comboBoxEmailDay.setModel(new DefaultComboBoxModel<String>(new String[] {"All", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"}));
-		comboBoxEmailDay.setBounds(217, 207, 120, 23);
+		comboBoxEmailDay.setBounds(217, 223, 120, 23);
 		EmailTab.add(comboBoxEmailDay);
 		
 		JLabel lblSelectTerm_2 = new JLabel("Select Term: ");
@@ -1310,7 +1381,7 @@ public class ChacoSwim extends JFrame {
 		EmailTab.add(lblSelectTerm_2);
 		
 		JLabel lblSelectDay_1 = new JLabel("Select Day: ");
-		lblSelectDay_1.setBounds(79, 211, 128, 14);
+		lblSelectDay_1.setBounds(79, 227, 128, 14);
 		EmailTab.add(lblSelectDay_1);
 		
 		JSeparator separator_3 = new JSeparator();
@@ -1350,6 +1421,7 @@ public class ChacoSwim extends JFrame {
 		rdbtnAllCoaches.setEnabled(false);
 		comboBoxEmailTerm.setEnabled(false);
 		comboBoxEmailDay.setEnabled(false);
+		comboBoxEmailLoc.setEnabled(false);
 		
 		JScrollPane scrollPane_5 = new JScrollPane();
 		scrollPane_5.setBounds(80, 339, 460, 156);
@@ -1434,6 +1506,12 @@ public class ChacoSwim extends JFrame {
 		JSeparator separator_6 = new JSeparator();
 		separator_6.setBounds(69, 524, 484, 2);
 		EmailTab.add(separator_6);
+		
+		JLabel lblSelectLocation_1 = new JLabel("Select Location: ");
+		lblSelectLocation_1.setBounds(79, 195, 128, 14);
+		EmailTab.add(lblSelectLocation_1);
+		
+		
 		
 		
 		//Statistics Part
@@ -1631,11 +1709,11 @@ public class ChacoSwim extends JFrame {
 					if(ans==JFileChooser.APPROVE_OPTION){
 						File file = chooser.getSelectedFile();
 						if(file.getName().endsWith(".xlsx")){						
-							new WriteToExcel(file,comboBoxExTerm.getSelectedItem().toString(),comboBoxExDay.getSelectedItem().toString()).startWrite();
+							new WriteToExcel(file,comboBoxExTerm.getSelectedItem().toString(),comboBoxExLoc.getSelectedItem().toString(),comboBoxExDay.getSelectedItem().toString()).startWrite();
 						}
 						else{
 							File file1 = new File(file.getAbsolutePath()+".xlsx");
-							new WriteToExcel(file1,comboBoxExTerm.getSelectedItem().toString(),comboBoxExDay.getSelectedItem().toString()).startWrite();
+							new WriteToExcel(file1,comboBoxExTerm.getSelectedItem().toString(),comboBoxExLoc.getSelectedItem().toString(),comboBoxExDay.getSelectedItem().toString()).startWrite();
 						}
 						//then write to excel file
 						
@@ -1669,6 +1747,20 @@ public class ChacoSwim extends JFrame {
 		comboBoxExTerm.setBounds(981, 89, 175, 23);
 		Export.add(comboBoxExTerm);
 		
+		JLabel lblSelectLocation = new JLabel("Select Location:");
+		lblSelectLocation.setBounds(863, 123, 108, 23);
+		Export.add(lblSelectLocation);
+		
+		comboBoxExLoc = new JComboBox<String>(new DefaultComboBoxModel<String>(getTables("location")));
+		comboBoxExLoc.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				refreshExTableTerm();
+			}
+		});
+		comboBoxExLoc.setBounds(981, 124, 175, 23);
+		Export.add(comboBoxExLoc);
+		
+		
 		comboBoxExDay = new JComboBox<String>();
 		comboBoxExDay.setModel(new DefaultComboBoxModel<String>(new String[] {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"}));
 		comboBoxExDay.addActionListener(new ActionListener() {
@@ -1676,7 +1768,7 @@ public class ChacoSwim extends JFrame {
 				refreshExTableTerm();
 			}
 		});
-		comboBoxExDay.setBounds(981, 150, 120, 23);
+		comboBoxExDay.setBounds(982, 157, 120, 23);
 		Export.add(comboBoxExDay);
 		
 		JScrollPane scrollPane_2 = new JScrollPane();
@@ -1691,7 +1783,7 @@ public class ChacoSwim extends JFrame {
 		Export.add(lblSelectTerm_1);
 		
 		JLabel lblSelectDay = new JLabel("Select Day:");
-		lblSelectDay.setBounds(863, 150, 108, 23);
+		lblSelectDay.setBounds(863, 158, 108, 23);
 		Export.add(lblSelectDay);
 		
 		JSeparator separator_7 = new JSeparator();
@@ -1803,6 +1895,8 @@ public class ChacoSwim extends JFrame {
 		btnImportSqliteFile.setFont(new Font("Tahoma", Font.BOLD, 13));
 		btnImportSqliteFile.setBounds(646, 441, 153, 33);
 		Export.add(btnImportSqliteFile);
+		
+		
 		
 		JPanel SettingTab = new JPanel();
 		tabbedPane.addTab("Settings", null, SettingTab, null);

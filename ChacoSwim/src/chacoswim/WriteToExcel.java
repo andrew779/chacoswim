@@ -28,6 +28,7 @@ public class WriteToExcel {
 	private File file=null;
 	private String day = "";
 	private String term = "";
+	private String location= "";
 	private XSSFWorkbook wb=null;
 	private XSSFSheet sheet;
 	private Connection conn=null;
@@ -35,10 +36,11 @@ public class WriteToExcel {
 	private List<String> c1,c2,c3,c4,c5,c6;
 	private List<String> timeMark,lineMark;
 	
-	public WriteToExcel(File file,String term,String day){
+	public WriteToExcel(File file,String term,String location,String day){
 		this.file=file;
 		this.day=day;
 		this.term=term;
+		this.location=location;
 	}
 	
 	public CellStyle setHeadStyle(){
@@ -108,11 +110,15 @@ public class WriteToExcel {
 			else{
 				//query = "select t.sid, s.FirstName, s.LastName, s.CurLevel, t.day, t.time, t.line, t.coach from '"+term+"' t JOIN students s on s.sid = t.sid WHERE t.day = '"+day+ 
 				//	"' ORDER BY t.day, t.time, t.line, s.CurLevel";
+				DataBaseManage dbm = new DataBaseManage();
+				String termID = dbm.gotId("terms", term);
+				String locationID = dbm.gotId("location", location);
 				query = "select a.sid, s.firstName, s.lastName, level.name as CurLevel, a.day, a.time, a.line, c.name as Coach from"
 						+" active_record a JOIN students s ON s.sid=a.sid"
 						+" JOIN level ON a.levelID = level.id"
 						+" JOIN coach c ON a.coachID = c.id"
-						+" WHERE a.day = '"+day+"'";
+						+" WHERE a.day = '"+day+"' AND a.termID = '"+termID+"' AND a.locationID = '"+locationID+"'"
+						+" ORDER BY a.day, a.time, a.line, level.name";
 			}
 			PreparedStatement pst=conn.prepareStatement(query);
 			rs = pst.executeQuery();
@@ -301,7 +307,7 @@ public class WriteToExcel {
 			
 			//title row
 			Row titleRow=sheet.createRow(0);
-			titleRow.createCell(0, 5).setCellValue(term+"("+day+")");
+			titleRow.createCell(0, 5).setCellValue(term+" - "+location+"("+day+")");
 			sheet.addMergedRegion(new CellRangeAddress(0,0,0,5));
 			//title style
 			titleRow.getCell(0).setCellStyle(setHeadStyle());
