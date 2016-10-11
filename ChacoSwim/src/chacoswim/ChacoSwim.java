@@ -1011,16 +1011,36 @@ public class ChacoSwim extends JFrame {
 		panelSt.setBorder(BorderFactory.createTitledBorder("Students"));
 		panelSt.setLayout(new MigLayout("", "[grow][]", ""));
 		
-		panelSt.add(new JLabel("Search By: "),"left,split 2");
+		//ROW#1
+		panelSt.add(new JLabel("Search By: "),"left,split 3");
 		
 		JComboBox comboBox = new JComboBox();
 		comboBox.setModel(new DefaultComboBoxModel(new String[] {"aaaaaaaa", "bbbbbbbbb", "ccccccccc"}));
-		panelSt.add(comboBox, "gapleft 10,wrap");
+		panelSt.add(comboBox, "gapleft 10");
+		panelSt.add(new JTextField("Enter Here"),"gapleft 20, width 150,gaptop 5,wrap");
 		
-		panelSt.add(new JTextField("Enter Here"),"width 150,gaptop 5,wrap");
+		//ROW#2
+		panelSt.add(new JLabel("Term:"),"left,sg 2,split 3");
+		panelSt.add(new JLabel("Location:"),"gapleft 50,sg 2");
+		panelSt.add(new JLabel("Day:"),"gapleft 50,sg 2,wrap");
 		
+		//ROW#3
+		JComboBox<String> comboBoxStTerm = new JComboBox<String>();
+		comboBoxStTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
+		JComboBox<String> comboBoxStLoc = new JComboBox<String>();
+		comboBoxStLoc.setModel(new DefaultComboBoxModel<String>(getTables("location")));
+		JComboBox<String> comboBoxStDay = new JComboBox<String>();
+		comboBoxStDay.setModel(new DefaultComboBoxModel<String>(new String[]{"All","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"}));
+		panelSt.add(comboBoxStTerm,"left,split 3,sg 2");
+		panelSt.add(comboBoxStLoc,"gapleft 50,sg 2");
+		panelSt.add(comboBoxStDay,"gapleft 50,sg 2");
+		//right side
+		JButton btnStEdit = new JButton("Edit");
+		panelSt.add(btnStEdit,"right,width 70,wrap");
+		
+		//ROW#4
 		JScrollPane scrollPane_10 = new JScrollPane();
-		panelSt.add(scrollPane_10, "w 200:1000:,h 100:200:,grow");
+		panelSt.add(scrollPane_10, "w 200:1000:,h 100:300:,span,grow,gaptop 10");
 		JTable jtStudents = new JTable();
 		scrollPane_10.setViewportView(jtStudents);
 		jtStudents.setFillsViewportHeight(true);
