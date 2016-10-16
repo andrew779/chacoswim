@@ -138,6 +138,12 @@ public class ChacoSwim extends JFrame {
 	private JComboBox<String> comboBoxLocation;
 	private JComboBox<String> comboBoxExLoc;
 	private JComboBox<String> comboBoxEmailLoc;
+	private JComboBox<String> comboBoxStKey;
+	private JTextField tfStKey;
+	private JComboBox<String> comboBoxStTerm;
+	private JComboBox<String> comboBoxStLoc;
+	private JComboBox<String> comboBoxStDay;
+	private JTable jtSt;
 	/**
 	 * Launch the application.
 	 */
@@ -206,6 +212,7 @@ public class ChacoSwim extends JFrame {
 				pst.close();
 				rs.close();
 				return location;
+		
 			}//switch
 			
 		} catch (SQLException e) {
@@ -216,15 +223,50 @@ public class ChacoSwim extends JFrame {
 	}
 	
 	//refreshing two tables----------------------------------------
-	public void refreshTable(){
+	//TODO refreshTable
+	public void refreshTable(JTable table,String key){
+		PreparedStatement pst=null;
+		ResultSet rs=null;
+		String query = "";
 		try{
-			String query="";
-			if(tglbtnSchedule.isSelected())
-			query="select * from students where sid < 16";
-			else query="select * from students where sid>15";
-			PreparedStatement pst=conn.prepareStatement(query);
-			ResultSet rs=pst.executeQuery();
-			table.setModel(DbUtils.resultSetToTableModel(rs));
+			if(key.equalsIgnoreCase("overall")){
+				if(tglbtnSchedule.isSelected())
+					query="select * from students where sid < 16";
+					else query="select * from students where sid>15";
+					pst=conn.prepareStatement(query);
+					rs=pst.executeQuery();
+					table.setModel(DbUtils.resultSetToTableModel(rs));
+			}
+			else if(key.equalsIgnoreCase("students")){
+				String str = tfStKey.getText()+"%";
+				String StTerm = comboBoxStTerm.getSelectedItem().toString();
+				String Stloc = comboBoxStLoc.getSelectedItem().toString();
+				String StDay = comboBoxStDay.getSelectedItem().toString();
+				String StKey = comboBoxStKey.getSelectedItem().toString();
+				if(StKey.equalsIgnoreCase("sid")||StKey.equalsIgnoreCase("amount"))StKey = "a."+StKey;
+				else if(StKey.equalsIgnoreCase("firstname")||StKey.equalsIgnoreCase("lastname")||StKey.equalsIgnoreCase("cell"))StKey = "s."+StKey;
+				if(StDay.equalsIgnoreCase("all")) StDay = "%";
+				
+				query = "select a.id, s.sid, s.firstName, s.lastName, t.name as Term, l.name as Location, level.name as Level, a.payment_method, a.amount, a.date from active_record a"
+						+" JOIN students s ON s.sid = a.sid"
+						+" JOIN terms t ON t.id = a.termID"
+						+" JOIN location l ON l.id = a.locationID"
+						+" JOIN level ON level.id = a.levelID"
+						+" WHERE t.name = ?1 AND l.name = ?2 AND a.day LIKE ?3 AND "+StKey+" LIKE ?4 COLLATE NOCASE ORDER BY a.sid"; 
+				//StKey can't be surrounded by ''
+				pst = conn.prepareStatement(query);
+				pst.setString(1, StTerm);
+				pst.setString(2, Stloc);
+				pst.setString(3, StDay);
+				pst.setString(4, str);
+				rs=pst.executeQuery();
+				table.setModel(DbUtils.resultSetToTableModel(rs));
+				//hide first column of 'ID'
+				TableColumnModel tcm = table.getColumnModel();
+				tcm.removeColumn(tcm.getColumn(0));
+			}
+			
+			
 			pst.close();
 			rs.close();
 		}catch(Exception e){
@@ -480,7 +522,7 @@ public class ChacoSwim extends JFrame {
 			pst.close();
 			rs.close();
 			}
-			else refreshTable();
+			else refreshTable(table,"overall");
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -715,7 +757,7 @@ public class ChacoSwim extends JFrame {
 				int a = JOptionPane.showConfirmDialog(null, "Do You Really Want to Delete the Selected Record?","Delete",JOptionPane.YES_NO_OPTION);
 				if (a==JOptionPane.YES_OPTION){
 					deleteStudent();
-					refreshTable();
+					refreshTable(table,"overall");
 				}
 			}
 		});
@@ -917,7 +959,7 @@ public class ChacoSwim extends JFrame {
 		btnRefreshAll = new JButton("Refresh All");
 		btnRefreshAll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				refreshTable();
+				refreshTable(table,"overall");
 				refreshTableTerm();
 				//seatsLeft();
 			}
@@ -940,7 +982,7 @@ public class ChacoSwim extends JFrame {
 					tglbtnSchedule.setText("Students");
 				}
 				
-				refreshTable();
+				refreshTable(table,"overall");
 			}
 		});
 		tglbtnSchedule.setIcon(new ImageIcon(new ImageIcon(this.getClass().getResource("/32megaphone2.png")).getImage()));
@@ -1009,15 +1051,22 @@ public class ChacoSwim extends JFrame {
 		
 		JPanel panelSt = new JPanel();
 		panelSt.setBorder(BorderFactory.createTitledBorder("Students"));
-		panelSt.setLayout(new MigLayout("", "[grow][]", ""));
+		panelSt.setLayout(new MigLayout("", "", ""));
 		
 		//ROW#1
 		panelSt.add(new JLabel("Search By: "),"left,split 3");
 		
-		JComboBox comboBox = new JComboBox();
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"aaaaaaaa", "bbbbbbbbb", "ccccccccc"}));
-		panelSt.add(comboBox, "gapleft 10");
-		panelSt.add(new JTextField("Enter Here"),"gapleft 20, width 150,gaptop 5,wrap");
+		comboBoxStKey = new JComboBox<String>();
+		comboBoxStKey.setModel(new DefaultComboBoxModel<String>(new String[] {"SID", "FirstName", "LastName","Cell","Amount"}));
+		panelSt.add(comboBoxStKey, "gapleft 10");
+		tfStKey = new JTextField();
+		tfStKey.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				refreshTable(jtSt,"students");
+			}
+		});
+		panelSt.add(tfStKey,"gapleft 20, width 150,gaptop 5,wrap");
 		
 		//ROW#2
 		panelSt.add(new JLabel("Term:"),"left,sg 2,split 3");
@@ -1025,28 +1074,63 @@ public class ChacoSwim extends JFrame {
 		panelSt.add(new JLabel("Day:"),"gapleft 50,sg 2,wrap");
 		
 		//ROW#3
-		JComboBox<String> comboBoxStTerm = new JComboBox<String>();
+		comboBoxStTerm = new JComboBox<String>();
+		comboBoxStTerm.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				refreshTable(jtSt,"students");
+			}
+		});
 		comboBoxStTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
-		JComboBox<String> comboBoxStLoc = new JComboBox<String>();
+		comboBoxStLoc = new JComboBox<String>();
+		comboBoxStLoc.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				refreshTable(jtSt,"students");
+			}
+		});
 		comboBoxStLoc.setModel(new DefaultComboBoxModel<String>(getTables("location")));
-		JComboBox<String> comboBoxStDay = new JComboBox<String>();
+		comboBoxStDay = new JComboBox<String>();
+		comboBoxStDay.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				refreshTable(jtSt,"students");
+			}
+		});
 		comboBoxStDay.setModel(new DefaultComboBoxModel<String>(new String[]{"All","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"}));
 		panelSt.add(comboBoxStTerm,"left,split 3,sg 2");
 		panelSt.add(comboBoxStLoc,"gapleft 50,sg 2");
 		panelSt.add(comboBoxStDay,"gapleft 50,sg 2");
 		//right side
 		JButton btnStEdit = new JButton("Edit");
+		btnStEdit.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				refreshTable(jtSt,"students");
+			}
+			
+		});
+		
 		panelSt.add(btnStEdit,"right,width 70,wrap");
 		
 		//ROW#4
 		JScrollPane scrollPane_10 = new JScrollPane();
-		panelSt.add(scrollPane_10, "w 200:1000:,h 100:300:,span,grow,gaptop 10");
-		JTable jtStudents = new JTable();
-		scrollPane_10.setViewportView(jtStudents);
-		jtStudents.setFillsViewportHeight(true);
-		jtStudents.setModel(new DefaultTableModel());
+		panelSt.add(scrollPane_10, "w 200:1000:,h 100:300:,span,grow,gaptop 10,pushx");
+		jtSt = new JTable();
+		
+		scrollPane_10.setViewportView(jtSt);
+		jtSt.setFillsViewportHeight(true);
+		jtSt.setAutoCreateRowSorter(true);
+		
+		jtSt.setModel(new DefaultTableModel());
+		//jtSt.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		resizeColumnWidth(jtSt);
+		
+		//ROW#5
+		panelSt.add(new JLabel("Name:"))
+		
 		
 		StudentsTab.add(panelSt, "cell 0 0,grow");
+		
+		
 		/*
 		
 		

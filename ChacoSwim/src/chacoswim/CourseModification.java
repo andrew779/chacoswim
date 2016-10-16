@@ -123,7 +123,7 @@ public class CourseModification extends JFrame {
 			ResultSet rs = pst.executeQuery();
 			//if true, use update .
 			if(rs.next()){
-				String update="UPDATE 'main'.'active_record' SET 'day' = ?, 'time' = ?, 'line' = ?, 'coachID' = ?,'payment_method' = ?,'amount' =  ? WHERE  id = "+id;
+				String update="UPDATE 'main'.'active_record' SET 'day' = ?1, 'time' = ?2, 'line' = ?3, 'coachID' = ?4,'payment_method' = ?5,'amount' =  ?6 WHERE  id = "+id;
 				PreparedStatement pstUp = conn.prepareStatement(update);
 				pstUp.setString(1, comboBoxDays.getSelectedItem().toString());
 				String time = comboBoxStart.getSelectedItem().toString()+"-"+comboBoxEnd.getSelectedItem().toString();
@@ -162,7 +162,7 @@ public class CourseModification extends JFrame {
 			pst.setString(6, comboBoxLine.getSelectedItem().toString());
 			pst.setString(7,dbm.gotId("coach", comboBoxCoach.getSelectedItem().toString()));
 			pst.setString(8, dbm.gotId("level", dbm.getCurLevel(tfSID.getText().toString())));
-			pst.setString(9, comboBoxLine.getSelectedItem().toString());
+			pst.setString(9, comboBoxPay.getSelectedItem().toString());
 			pst.setString(10, tfAmount.getText());
 			pst.execute();
 			
