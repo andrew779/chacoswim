@@ -57,6 +57,8 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import model.ChacoSwimModel;
+
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.Color;
@@ -86,6 +88,7 @@ public class ChacoSwim extends JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private ChacoSwimMethods csp;
 	private JPanel contentPane;
 	private JTable table;
 	private Connection conn=null;
@@ -144,6 +147,19 @@ public class ChacoSwim extends JFrame {
 	private JComboBox<String> comboBoxStLoc;
 	private JComboBox<String> comboBoxStDay;
 	private JTable jtSt;
+	private JTextField stSID;
+	private JTextField stFN;
+	private JTextField stLN;
+	private JTextField stAmount;
+	private JComboBox<String> stMethod;
+	private JTextField stDate;
+	private JButton stUpdate;
+	private JButton stDelete;
+	private JTextField rtTR;
+	private JTextField rtTA;
+	private JTextField rtUN;
+	private JTextField rtRC;
+	private JButton rtRList;
 	/**
 	 * Launch the application.
 	 */
@@ -158,6 +174,9 @@ public class ChacoSwim extends JFrame {
 					Image imglogo=new ImageIcon(this.getClass().getResource("/logo24.png")).getImage();
 					frame.setIconImage(imglogo);
 					frame.setTitle("Chaco Swim Club");
+					
+					ChacoSwimModel csm = new ChacoSwimModel();
+					ChacoSwimMethods csp = new ChacoSwimMethods(frame,csm);
 					//frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 					
 				} catch (Exception e) {
@@ -179,6 +198,10 @@ public class ChacoSwim extends JFrame {
 	        columnModel.getColumn(column).setPreferredWidth(width);
 	    } 
 	} 
+	
+	public void setPresenter(ChacoSwimMethods csp){
+		this.csp = csp;
+	}
 	
 	public String[] getTables(String key){
 		List<String> list = new ArrayList<String>();
@@ -247,7 +270,7 @@ public class ChacoSwim extends JFrame {
 				else if(StKey.equalsIgnoreCase("firstname")||StKey.equalsIgnoreCase("lastname")||StKey.equalsIgnoreCase("cell"))StKey = "s."+StKey;
 				if(StDay.equalsIgnoreCase("all")) StDay = "%";
 				
-				query = "select a.id, s.sid, s.firstName, s.lastName, t.name as Term, l.name as Location, level.name as Level, a.payment_method, a.amount, a.date from active_record a"
+				query = "select a.id, a.sid, s.firstName, s.lastName, t.name as Term, l.name as Location, level.name as Level, a.payment_method, a.amount, a.date from active_record a"
 						+" JOIN students s ON s.sid = a.sid"
 						+" JOIN terms t ON t.id = a.termID"
 						+" JOIN location l ON l.id = a.locationID"
@@ -261,9 +284,27 @@ public class ChacoSwim extends JFrame {
 				pst.setString(4, str);
 				rs=pst.executeQuery();
 				table.setModel(DbUtils.resultSetToTableModel(rs));
+				
 				//hide first column of 'ID'
-				TableColumnModel tcm = table.getColumnModel();
-				tcm.removeColumn(tcm.getColumn(0));
+				TableColumnModel tcm1 = table.getColumnModel();
+				tcm1.removeColumn(tcm1.getColumn(0));
+				
+				//fill the top right textfields
+				int total = table.getRowCount();
+				rtTR.setText(String.valueOf(total));
+				double sum = 0.0;
+				String value = "";
+				int unpaidCount = 0;
+				for(int i = 0;i<total;i++){
+					value = table.getValueAt(i, 7).toString();
+					if(!value.isEmpty())
+					sum += Double.valueOf(value);
+					if(table.getValueAt(i, 6).toString().equalsIgnoreCase("unpaid"))
+						unpaidCount++;
+				}
+				rtTA.setText(String.valueOf(sum));
+				rtUN.setText(String.valueOf(unpaidCount));
+				
 			}
 			
 			
@@ -273,7 +314,28 @@ public class ChacoSwim extends JFrame {
 			e.printStackTrace();
 		}
 	}
-	
+	public void updateData(String key){
+		PreparedStatement pst=null;
+		String query = "";
+		try {
+			switch(key){
+			case "financial":
+				query = "UPDATE active_record SET amount = ?1, payment_method = ?2, date = ?3 WHERE id = ?4";
+				pst = conn.prepareStatement(query);
+				pst.setString(1, stAmount.getText());
+				pst.setString(2,stMethod.getSelectedItem().toString());
+				pst.setString(3, stDate.getText());
+				pst.setString(4, jtSt.getModel().getValueAt(jtSt.getSelectedRow(), 0).toString());
+				
+				pst.execute();
+				pst.close();
+				break;
+				
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 	public void refreshExTableTerm(){
 		ResultSet rs=null;
 		try{
@@ -647,6 +709,11 @@ public class ChacoSwim extends JFrame {
 	/**
 	 * Create the frame.
 	 */
+	public ChacoSwim(ChacoSwimMethods csp) {
+		this.csp = csp;
+	}
+	
+	
 	public ChacoSwim() {
 		setResizable(true);
 		conn=sqliteConnection.dbConnector();
@@ -933,13 +1000,16 @@ public class ChacoSwim extends JFrame {
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String term = comboBoxTerm.getSelectedItem().toString();
-				String query = "DELETE FROM 'active_record' WHERE ID = ?;";
+				PreparedStatement pst=null;
+				String query = "DELETE FROM 'active_record' WHERE ID = ?1";
 				int row = tableTerm.getSelectedRow();
 				String id = tableTerm.getModel().getValueAt(row, 0).toString();
+				//JOptionPane.showMessageDialog(null, id);
 				int ans = JOptionPane.showConfirmDialog(null, "Do you really want to delete selected record","Deleting",JOptionPane.YES_NO_OPTION);
 				if(ans==JOptionPane.YES_OPTION){
 					try {
-						PreparedStatement pst = conn.prepareStatement(query);
+
+						pst = conn.prepareStatement(query);
 						pst.setString(1, id);
 						pst.execute();
 						pst.close();
@@ -1043,11 +1113,19 @@ public class ChacoSwim extends JFrame {
 		});
 		comboBoxLocation.setBounds(176, 314, 129, 20);
 		panel.add(comboBoxLocation);
+		
+		JLabel labelLine = new JLabel("Line:");
+		labelLine.setBounds(478, 292, 46, 14);
+		panel.add(labelLine);
+		
+		JComboBox<String> comboBoxLine = new JComboBox<String>();
+		comboBoxLine.setBounds(478, 311, 119, 20);
+		panel.add(comboBoxLine);
 
 //Start Students Tab-----------------------TODO StudentTab
 		JPanel StudentsTab = new JPanel();
 		tabbedPane.addTab("Students", null, StudentsTab, null);
-		StudentsTab.setLayout(new MigLayout("", "[grow]", "[]"));
+		StudentsTab.setLayout(new MigLayout("", "", ""));
 		
 		JPanel panelSt = new JPanel();
 		panelSt.setBorder(BorderFactory.createTitledBorder("Students"));
@@ -1070,8 +1148,8 @@ public class ChacoSwim extends JFrame {
 		
 		//ROW#2
 		panelSt.add(new JLabel("Term:"),"left,sg 2,split 3");
-		panelSt.add(new JLabel("Location:"),"gapleft 50,sg 2");
-		panelSt.add(new JLabel("Day:"),"gapleft 50,sg 2,wrap");
+		panelSt.add(new JLabel("Location:"),"gapleft 30,sg 2");
+		panelSt.add(new JLabel("Day:"),"gapleft 30,sg 2,wrap");
 		
 		//ROW#3
 		comboBoxStTerm = new JComboBox<String>();
@@ -1096,39 +1174,160 @@ public class ChacoSwim extends JFrame {
 		});
 		comboBoxStDay.setModel(new DefaultComboBoxModel<String>(new String[]{"All","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"}));
 		panelSt.add(comboBoxStTerm,"left,split 3,sg 2");
-		panelSt.add(comboBoxStLoc,"gapleft 50,sg 2");
-		panelSt.add(comboBoxStDay,"gapleft 50,sg 2");
-		//right side
-		JButton btnStEdit = new JButton("Edit");
-		btnStEdit.addActionListener(new ActionListener(){
-
+		panelSt.add(comboBoxStLoc,"gapleft 30,sg 2");
+		panelSt.add(comboBoxStDay,"gapleft 30,sg 2");
+		
+		//right top pane -- report info
+		JPanel rt = new JPanel();
+		rt.setBorder(BorderFactory.createTitledBorder("Report"));
+		rt.setLayout(new MigLayout("", "", ""));
+		//rt #1
+		rt.add(new JLabel("Total records: "),"left,sg rt1");
+		rtTR = new JTextField();
+		rtTR.setEditable(false);
+		rt.add(rtTR,"sg rttf,w :70:,growx");
+		
+		rt.add(new JLabel("Retake count:"),"left,sg rt1,gapleft 30");
+		rtRC = new JTextField();
+		rt.add(rtRC,"sg rttf,w :70:,growx,wrap");
+		//rt #2
+		rt.add(new JLabel("Total amount: "),"left,sg rt1");
+		rtTA = new JTextField();
+		rtTA.setEditable(false);
+		rt.add(rtTA,"sg rttf,w :70:,growx");
+		rtRList = new JButton("Show Detail");
+		rt.add(rtRList,"wrap,w 100!,skip");
+		//rt #3
+		rt.add(new JLabel("Unpaid number:"));
+		rtUN = new JTextField();
+		rtUN.setEditable(false);
+		rt.add(rtUN,"sg rttf,w :70:,growx,wrap");
+		
+		//SELECT sid,levelID,count(levelID) from active_record GROUP by sid,levelID having count(*)>2
+		
+		
+		
+		
+		//middle panel -- table
+		JPanel middle = new JPanel();
+		middle.setBorder(BorderFactory.createTitledBorder("Table"));
+		middle.setLayout(new MigLayout());
+		
+		jtSt = new JTable();
+		jtSt.addMouseListener(new MouseAdapter() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				refreshTable(jtSt,"students");
+			public void mouseClicked(MouseEvent arg0) {
+				int row = jtSt.getSelectedRow();
+			//	JOptionPane.showMessageDialog(null, jtSt.getValueAt(row, 0));
+				if(row!=-1){
+					stSID.setText(jtSt.getValueAt(row, 0).toString());
+					if(jtSt.getValueAt(row, 1)!=null)
+					stFN.setText(jtSt.getValueAt(row, 1).toString());
+					if(jtSt.getValueAt(row, 2)!=null)
+					stLN.setText(jtSt.getValueAt(row, 2).toString());
+					if(jtSt.getValueAt(row,7)!=null)
+						stAmount.setText(jtSt.getValueAt(row,7).toString());
+					if(jtSt.getValueAt(row, 6)!=null)
+						stMethod.setSelectedItem(jtSt.getValueAt(row, 6));
+					if(jtSt.getValueAt(row, 8)!=null)
+						stDate.setText(jtSt.getValueAt(row, 8).toString());
+				}
 			}
-			
 		});
 		
-		panelSt.add(btnStEdit,"right,width 70,wrap");
-		
-		//ROW#4
-		JScrollPane scrollPane_10 = new JScrollPane();
-		panelSt.add(scrollPane_10, "w 200:1000:,h 100:300:,span,grow,gaptop 10,pushx");
-		jtSt = new JTable();
-		
-		scrollPane_10.setViewportView(jtSt);
 		jtSt.setFillsViewportHeight(true);
 		jtSt.setAutoCreateRowSorter(true);
 		
 		jtSt.setModel(new DefaultTableModel());
 		//jtSt.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		resizeColumnWidth(jtSt);
+		JScrollPane scrollPane_10 = new JScrollPane();
+		scrollPane_10.setViewportView(jtSt);
+		//panelSt.add(scrollPane_10, "w 200:1000:,h 100:300:,span,grow,gaptop 10,pushx");
+		middle.add(scrollPane_10,"w 200:1000:,h 100:300:,span,grow,gaptop 10");
 		
-		//ROW#5
-		panelSt.add(new JLabel("Name:"))
+		//second panel
+		JPanel panelStEdit = new JPanel();
+		panelStEdit.setBorder(BorderFactory.createTitledBorder("Edit"));
+		panelStEdit.setLayout(new MigLayout("", "[]30[]", ""));
+		//ROW#1 2nd
+		//gp1
+		panelStEdit.add(new JLabel("SID: "),"sg sid, left,split 2");
+		stSID = new JTextField();
+		stSID.setEnabled(false);
+		panelStEdit.add(stSID,"left,growx,w 70!");
+		//gp2
+		panelStEdit.add(new JLabel("FirstName: "),"left,sg lbl1,split 2");
+		stFN = new JTextField();
+		stFN.setEnabled(false);
+		panelStEdit.add(stFN,"left,sg stedit,growx,w :170:");
+		//gp3
+		panelStEdit.add(new JLabel("LastName: "),"left,sg lbl1,split 2");
+		stLN = new JTextField();
+		stLN.setEnabled(false);
+		panelStEdit.add(stLN,"left,sg stedit,growx,w :170:");
+		
+		stUpdate = new JButton("Update");
+		stUpdate.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//TODO DOING STBUTTONS
+				updateData("financial");
+				JOptionPane.showMessageDialog(null, "updated");
+				refreshTable(jtSt,"students");
+				
+				
+			}
+		});
+		panelStEdit.add(stUpdate,"skip, right,span,w 100!,wrap");
+		//ROW#2
+		panelStEdit.add(new JLabel("Amount: "),"sg sid, left, split 2");
+		stAmount = new JTextField();
+		panelStEdit.add(stAmount,"left,growx,w 70!");
+		panelStEdit.add(new JLabel("Method: "),"left,sg lbl1,split 2");
+		stMethod = new JComboBox<String>();
+		stMethod.setModel(new DefaultComboBoxModel<String>(new String[] {"Unpaid", "Cash", "Cheque", "EMT", "CreditCard", "BankDraft", "N/A"}));
+		panelStEdit.add(stMethod,"left,sg stedit,growx,w :170:");
+		panelStEdit.add(new JLabel("Date:(yyyy-mm-dd) "),"left,sg lbl1,split 2");
+		stDate = new JTextField();
+		panelStEdit.add(stDate,"left,sg stedit,growx,w :170:");
 		
 		
-		StudentsTab.add(panelSt, "cell 0 0,grow");
+		stDelete = new JButton("Delete");
+		stDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				PreparedStatement pst=null;
+				String query = "DELETE FROM 'active_record' WHERE ID = ?1";
+				int row = jtSt.getSelectedRow();
+				String id = jtSt.getModel().getValueAt(row, 0).toString();
+				//JOptionPane.showMessageDialog(null, id);
+				int ans = JOptionPane.showConfirmDialog(null, "Do you really want to delete selected record","Deleting",JOptionPane.YES_NO_OPTION);
+				if(ans==JOptionPane.YES_OPTION){
+					try {
+
+						pst = conn.prepareStatement(query);
+						pst.setString(1, id);
+						pst.execute();
+						pst.close();
+						JOptionPane.showMessageDialog(null, "Deleted");
+					} catch (SQLException e) {
+						JOptionPane.showMessageDialog(null,"Line912: "+ e);
+					}
+				}
+				refreshTable(jtSt,"students");
+			}
+		});
+				
+			
+		panelStEdit.add(stDelete,"w 100!,span,right,wrap");
+		
+		
+		//TODO adding sub panels
+		StudentsTab.add(panelSt, "");
+		StudentsTab.add(rt,"span,grow,wrap");
+		StudentsTab.add(middle,"wrap,span,grow");
+		StudentsTab.add(panelStEdit,"span,grow");
+		
 		
 		
 		/*
