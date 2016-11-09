@@ -45,7 +45,7 @@ public class Login {
 					window.frameLogin.setVisible(true);
 					Image imglogo=new ImageIcon(this.getClass().getResource("/logo24.png")).getImage();
 					window.frameLogin.setIconImage(imglogo);
-					window.frameLogin.setTitle("Chaco Swim Club");
+					window.frameLogin.setTitle("Chaco Swim Club  (Powered by Wenzhong Zheng)");
 					
 				} catch (Exception e) {
 					e.printStackTrace();

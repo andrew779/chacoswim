@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import net.proteanit.sql.DbUtils;
+import presenter.ChacoSwimMethods;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -56,6 +57,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
+import javax.swing.text.JTextComponent;
 
 import model.ChacoSwimModel;
 
@@ -81,28 +83,26 @@ import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 
 import net.miginfocom.swing.MigLayout;
+import javax.swing.JCheckBox;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 public class ChacoSwim extends JFrame {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private ChacoSwimMethods csp;
 	private JPanel contentPane;
 	private JTable table;
 	private Connection conn=null;
 	private JComboBox<String> comboBoxtable;
-	private JComboBox<Object> comboBoxTerm;
+	private JComboBox<String> comboBoxTerm;
 	JComboBox<String> comboBoxEmailDay;
 	JComboBox<String> comboBoxEmailTerm;
 	JComboBox<String> comboBoxExDay;
 	private JComboBox<Object> comboBoxdays;
 	JComboBox<String> comboBoxExTerm;
 	private JTextField tfSearch;
-	//private String SID_="";
-	private JTextArea taInfo;
-	JLabel lblL1,lblL2,lblL3,lblL4,lblL5,lblL6,lblL7,lblL8,lblSplash,lblCrashfront,lblCrashbreast,lblAdult,lblTeam;
 	private JTable tableTerm;
 	private JTable tableExport;
 	private JTextField tfTo;
@@ -160,8 +160,31 @@ public class ChacoSwim extends JFrame {
 	private JTextField rtUN;
 	private JTextField rtRC;
 	private JButton rtRList;
+	private JComboBox<String> comboBoxLine;
+	private JComboBox<String> cbSchTerm;
+	private JComboBox<String> cbSchLocation;
+	private JComboBox<String> cbSchDay;
+	private SchedulePanels sps2;
+	
+	private SchedulePanels sps3;
+	private SchedulePanels sps4;
+	private SchedulePanels sps5;
+	private SchedulePanels sps6;
+	private SchedulePanels sps1;
+	private JComboBox<String> cbSchStart;
+	private JComboBox<String> cbSchEnd;
+	private JComboBox<String> cbSchHistory;
+	private JCheckBox chckCondition;
+	private JPanel schLine6;
+	private JPanel ScheduleTab;
+	private int retake;
+	private JLabel lblTotal;
+	private JButton btnReload;
+	private JPanel CoachTab;
+	private JTable jtTimeCount;
+	private JTable jtLineCount;
 	/**
-	 * Launch the application.
+	 * TODO Launch the application.
 	 */
 	public static void main(Connection connection) {
 		EventQueue.invokeLater(new Runnable() {
@@ -169,14 +192,19 @@ public class ChacoSwim extends JFrame {
 
 			public void run() {
 				try {
+					
 					frame = new ChacoSwim();
+					ChacoSwimModel csm = new ChacoSwimModel();
+					ChacoSwimMethods csp = new ChacoSwimMethods(frame,csm);
+					frame.setCSP(csp);
+					frame.initialValues();
 					frame.setVisible(true);
 					Image imglogo=new ImageIcon(this.getClass().getResource("/logo24.png")).getImage();
 					frame.setIconImage(imglogo);
-					frame.setTitle("Chaco Swim Club");
+					frame.setTitle("Chaco Swim Club  (Powered by Wenzhong Zheng)");
 					
-					ChacoSwimModel csm = new ChacoSwimModel();
-					ChacoSwimMethods csp = new ChacoSwimMethods(frame,csm);
+					
+					
 					//frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 					
 				} catch (Exception e) {
@@ -184,6 +212,96 @@ public class ChacoSwim extends JFrame {
 				}
 			}
 		});
+	}
+	
+	public void setCSP(ChacoSwimMethods csp){
+		this.csp = csp;
+	}
+	
+	//SchedulePanels getters
+	public SchedulePanels getSps2() {
+		return sps2;
+	}
+
+	public SchedulePanels getSps3() {
+		return sps3;
+	}
+
+	public SchedulePanels getSps4() {
+		return sps4;
+	}
+
+	public SchedulePanels getSps5() {
+		return sps5;
+	}
+
+	public SchedulePanels getSps6() {
+		return sps6;
+	}
+
+	public SchedulePanels getSps1() {
+		return sps1;
+	}
+	
+	public JComboBox<String> getCbSchStart() {
+		return cbSchStart;
+	}
+
+	public JComboBox<String> getCbSchEnd() {
+		return cbSchEnd;
+	}
+
+	public JComboBox<String> getCbSchTerm() {
+		return cbSchTerm;
+	}
+
+	public JComboBox<String> getCbSchLocation() {
+		return cbSchLocation;
+	}
+
+	public JComboBox<String> getCbSchDay() {
+		return cbSchDay;
+	}
+	public int getRetake(){
+		return retake;
+	}
+
+	/**
+	 * TODO table getter
+	 * @param key
+	 * @return
+	 */
+	public JTable tableGetter(String key){
+		JTable table=null;
+		switch(key.toLowerCase()){
+			case "overtop":
+				table = this.table;
+				break;
+			case "overbuttom":
+			case "overbuttom2":
+				table = tableTerm;
+				break;
+			case "students":
+				table = jtSt;
+				break;
+			case "coaches":
+				table = jtCoaches;
+				break;
+			case "studentretake":
+				table = jtSt;
+				break;
+			case "jttimecount":
+			case "jttimecount0":
+				table = jtTimeCount;
+				break;
+			case "jtlinecount":
+			case "jtlinecount0":
+				table = jtLineCount;
+				break;
+			
+		}
+		
+		return table;
 	}
 	
 	public void resizeColumnWidth(JTable table) {
@@ -199,9 +317,6 @@ public class ChacoSwim extends JFrame {
 	    } 
 	} 
 	
-	public void setPresenter(ChacoSwimMethods csp){
-		this.csp = csp;
-	}
 	
 	public String[] getTables(String key){
 		List<String> list = new ArrayList<String>();
@@ -212,11 +327,11 @@ public class ChacoSwim extends JFrame {
 			 
 			switch(key){
 			case "terms":
-				query = "Select name from "+key;
+				query = "Select name from "+key+" order by id DESC";
 				pst=conn.prepareStatement(query);
 				rs=pst.executeQuery();
 				while(rs.next()){
-					list.add(0,rs.getString("name"));
+					list.add(rs.getString("name"));
 				}
 				String[] str= new String[list.size()];
 				list.toArray(str);
@@ -224,11 +339,11 @@ public class ChacoSwim extends JFrame {
 				rs.close();
 				return str;
 			case "location":
-				query = "Select name from "+key;
+				query = "Select name from "+key+" order by id DESC";
 				pst=conn.prepareStatement(query);
 				rs=pst.executeQuery();
 				while(rs.next()){
-					list.add(0,rs.getString("name"));
+					list.add(rs.getString("name"));
 				}
 				String[] location= new String[list.size()];
 				list.toArray(location);
@@ -251,6 +366,7 @@ public class ChacoSwim extends JFrame {
 		PreparedStatement pst=null;
 		ResultSet rs=null;
 		String query = "";
+		
 		try{
 			if(key.equalsIgnoreCase("overall")){
 				if(tglbtnSchedule.isSelected())
@@ -275,12 +391,12 @@ public class ChacoSwim extends JFrame {
 						+" JOIN terms t ON t.id = a.termID"
 						+" JOIN location l ON l.id = a.locationID"
 						+" JOIN level ON level.id = a.levelID"
-						+" WHERE t.name = ?1 AND l.name = ?2 AND a.day LIKE ?3 AND "+StKey+" LIKE ?4 COLLATE NOCASE ORDER BY a.sid"; 
+						+" WHERE t.name = ?1 AND l.name = ?2 AND a.day LIKE '"+StDay+"' AND "+StKey+" LIKE ?4 AND a.sid != 0 COLLATE NOCASE ORDER BY a.sid, t.name, level.name"; 
 				//StKey can't be surrounded by ''
 				pst = conn.prepareStatement(query);
 				pst.setString(1, StTerm);
 				pst.setString(2, Stloc);
-				pst.setString(3, StDay);
+				//pst.setString(3, StDay);
 				pst.setString(4, str);
 				rs=pst.executeQuery();
 				table.setModel(DbUtils.resultSetToTableModel(rs));
@@ -343,20 +459,27 @@ public class ChacoSwim extends JFrame {
 			String day = comboBoxExDay.getSelectedItem().toString();
 			String location = comboBoxExLoc.getSelectedItem().toString();
 			String query="";
-			if(day.equals("All")){
-				query = "select t.ID, t.SID, s.FirstName, s.LastName, s.CurLevel, t.Day, t.Time, t.Line, t.Coach from '"+term+"' t JOIN students s on s.sid = t.sid ORDER BY t.day, t.time, t.line, s.CurLevel";
+			DataBaseManage dbm = new DataBaseManage();
+			String termID = dbm.gotId("terms", term);
+			String locationID = dbm.gotId("location", location);
+			if(!chckCondition.isSelected()){
+					
+					query = "select a.sid, s.firstName, s.lastName, level.name as CurLevel, a.day, a.time, a.line, c.name as Coach from"
+							+" active_record a JOIN students s ON s.sid=a.sid"
+							+" JOIN level ON a.levelID = level.id"
+							+" JOIN coach c ON a.coachID = c.id"
+							+" WHERE a.sid != 0 and a.day = '"+day+"' AND a.termID = '"+termID+"' AND a.locationID = '"+locationID+"'"
+							+" ORDER BY a.day, a.time, a.line, level.name";
 			}
 			else{
-				DataBaseManage dbm = new DataBaseManage();
-				String termID = dbm.gotId("terms", term);
-				String locationID = dbm.gotId("location", location);
-				query = "select a.sid, s.firstName, s.lastName, level.name as CurLevel, a.day, a.time, a.line, c.name as Coach from"
-						+" active_record a JOIN students s ON s.sid=a.sid"
-						+" JOIN level ON a.levelID = level.id"
-						+" JOIN coach c ON a.coachID = c.id"
-						+" WHERE a.day = '"+day+"' AND a.termID = '"+termID+"' AND a.locationID = '"+locationID+"'"
-						+" ORDER BY a.day, a.time, a.line, level.name";
-				}
+					
+					query = "select a.sid, s.firstName, s.lastName, level.name as CurLevel, a.day, a.time, a.line, c.name as Coach from"
+							+" active_record a JOIN students s ON s.sid=a.sid"
+							+" JOIN level ON a.levelID = level.id"
+							+" JOIN coach c ON a.coachID = c.id"
+							+" WHERE a.sid = 0 and a.day = '"+day+"' AND a.termID = '"+termID+"' AND a.locationID = '"+locationID+"'"
+							+" ORDER BY a.day, a.time, a.line, level.name";
+			}
 			PreparedStatement pst=conn.prepareStatement(query);
 			rs = pst.executeQuery();
 			tableExport.setModel(DbUtils.resultSetToTableModel(rs));
@@ -370,6 +493,22 @@ public class ChacoSwim extends JFrame {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+	}
+	
+	public JComboBox<?> comboBoxGetter(String key){
+		switch(key){
+		case "comboBoxTerm":
+			return comboBoxTerm;
+		case "comboBoxLocation":
+			return comboBoxLocation;
+		case "comboBoxdays":
+			return comboBoxdays;
+		case "comboBoxLine":
+			return comboBoxLine;
+		case "cbSchLocation":
+			return cbSchLocation;
+		}
+		return null;
 	}
 	
 	public void refreshTableTerm(){
@@ -429,149 +568,150 @@ public class ChacoSwim extends JFrame {
 		l.setFont(new Font("Tahoma", Font.PLAIN, 11));
 	}
 	
-	public void seatsLeft(){
-		String term = comboBoxTerm.getSelectedItem().toString();
-		String day = comboBoxdays.getSelectedItem().toString();
-		int l1=0,l2=0,l3=0,l4=0,l5=0,l6=0,l7=0,l8=0,splash=0,crash_front=0,crash_breast=0,team=0,adult=0;
-		StringBuilder lvl01 = new StringBuilder("--------"+day+"------\n");
-		StringBuilder lvl0 = new StringBuilder("Level 0:\n");
-		StringBuilder lvl1 = new StringBuilder("Level 1:\n");
-		StringBuilder lvl2 = new StringBuilder("Level 2:\n");
-		StringBuilder lvl3 = new StringBuilder("Level 3:\n");
-		StringBuilder lvl4 = new StringBuilder("Level 4:\n");
-		StringBuilder lvl5 = new StringBuilder("Level 5:\n");
-		StringBuilder lvl6 = new StringBuilder("Level 6:\n");
-		StringBuilder lvl7 = new StringBuilder("Level 7:\n");
-		StringBuilder lvl8 = new StringBuilder("Level 8:\n");
-		StringBuilder lvl9 = new StringBuilder("Level Splash:\n");
-		StringBuilder lvl10 = new StringBuilder("Level Crash_Front:\n");
-		StringBuilder lvl11 = new StringBuilder("Level Crash_Breast:\n");
-		StringBuilder lvl12 = new StringBuilder("Level Adult:\n");
-		StringBuilder lvl13 = new StringBuilder("Level Team:\n");
-		try {
-			String query = "select t.sid, s.FirstName, s.LastName, s.CurLevel, t.day, t.time, t.line, t.coach from '"+term+"' t JOIN students s on s.sid = t.sid WHERE t.day = '"+day+ 
-					"' ORDER BY t.day, t.time";
-			PreparedStatement pst=conn.prepareStatement(query);
-			ResultSet rs = pst.executeQuery();
-			while(rs.next()){
-				switch(rs.getString("CurLevel")){
-				case "1_Swimmer 1": 
-					l1++;
-					lvl1.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+"  "+rs.getString("LastName")+"\n");
-					break;
-				case "2_Swimmer 2": 
-					l2++;
-					lvl2.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
-					break;
-				case "3_Swimmer 3": 
-					l3++;
-					lvl3.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
-					break;
-				case "4_Swimmer 4": 
-					l4++;
-					lvl4.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
-					break;
-				case "5_Swimmer 5": 
-					l5++;
-					lvl5.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
-					break;
-				case "6_Swimmer 6": 
-					l6++;
-					lvl6.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
-					break;
-				case "7_Swimmer 7": 
-					l7++;
-					lvl7.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
-					break;
-				case "8_Swimmer 8": 
-					l8++;
-					lvl8.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
-					break;
-				case "0_Swimmer 0":
-					lvl0.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
-					break;
-				case "9_Splash":
-					splash++;
-					lvl9.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
-					break;
-				case "10_Crash-Front":
-					crash_front++;
-					lvl10.append("     "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
-					break;
-				case "11_Crash-Breast":
-					crash_breast++;
-					lvl11.append("     "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
-					break;
-				case "12_Adult":
-					adult++;
-					lvl12.append("     "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
-					break;
-				case "13_Team":
-					team++;
-					lvl13.append("     "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
-					break;
-				default:
-					break;				
-				}//switch
-			}//while
-			lvl01.append(lvl0);
-			lvl01.append(lvl1);
-			lvl01.append(lvl2);
-			lvl01.append(lvl3);
-			lvl01.append(lvl4);
-			lvl01.append(lvl5);
-			lvl01.append(lvl6);
-			lvl01.append(lvl7);
-			lvl01.append(lvl8);lvl01.append(lvl9);lvl01.append(lvl10);lvl01.append(lvl11);lvl01.append(lvl12);lvl01.append(lvl13);
-			taInfo.setText(lvl01.toString());
-			
-			String warn="Exceed Class, and you won't be able to export an EXCEL File";
-			if(splash>=4){if(splash>6){JOptionPane.showMessageDialog(null, warn);}lblSplash.setText("Splash: "+splash);	newFont(lblSplash);}
-			else{lblSplash.setText("Splash: "+splash); oldFont(lblSplash);}
-			
-			if(crash_front>=4){if(crash_front>6){JOptionPane.showMessageDialog(null, warn);}lblCrashfront.setText("Crashfront: "+crash_front);newFont(lblCrashfront);}
-			else{lblCrashfront.setText("Crashfront: "+crash_front); oldFont(lblCrashfront);}
-			
-			if(crash_breast>=4){if(crash_breast>6){JOptionPane.showMessageDialog(null, warn);}lblCrashbreast.setText("Crashbreast: "+crash_breast);newFont(lblCrashbreast);}
-			else{lblCrashbreast.setText("Crashbreast: "+crash_breast); oldFont(lblCrashbreast);}
-			
-			if(adult>=4){if(adult>6){JOptionPane.showMessageDialog(null, warn);}lblAdult.setText("Adult: "+adult);newFont(lblAdult);}
-			else{lblAdult.setText("Adult: "+adult); oldFont(lblAdult);}
-			
-			if(team>=4){if(team>6){JOptionPane.showMessageDialog(null, warn);}lblTeam.setText("Team: "+team);newFont(lblTeam);}
-			else{lblTeam.setText("Team: "+team); oldFont(lblTeam);}
-			
-			if(l1>=4){if(l1>6){JOptionPane.showMessageDialog(null, warn);}lblL1.setText("L1: "+l1);	newFont(lblL1);}
-			else{lblL1.setText("L1: "+l1); oldFont(lblL1);}
-			
-			if(l2>=4){if(l2>6){JOptionPane.showMessageDialog(null, warn);}lblL2.setText("L2: "+l2);	newFont(lblL2);}
-			else{lblL2.setText("L2: "+l2); oldFont(lblL2);}
-			
-			if(l3>=4){if(l3>6){JOptionPane.showMessageDialog(null, warn);}lblL3.setText("L3: "+l3);	newFont(lblL3);}
-			else{lblL3.setText("L3: "+l3); oldFont(lblL3);}
-
-			if(l4>=4){if(l4>6){JOptionPane.showMessageDialog(null, warn);}lblL4.setText("L4: "+l4);	newFont(lblL4);}
-			else{lblL4.setText("L4: "+l4); oldFont(lblL4);}
-			
-			if(l5>=4){if(l5>6){JOptionPane.showMessageDialog(null, warn);}lblL5.setText("L5: "+l5);	newFont(lblL5);}
-			else{lblL5.setText("L5: "+l5); oldFont(lblL5);}
-			
-			if(l6>=4){if(l6>6){JOptionPane.showMessageDialog(null, warn);}lblL6.setText("L6: "+l6);	newFont(lblL6);}
-			else{lblL6.setText("L6: "+l6); oldFont(lblL6);}
-			
-			if(l7>=4){if(l7>6){JOptionPane.showMessageDialog(null, warn);}lblL7.setText("L7: "+l7);	newFont(lblL7);}
-			else{lblL7.setText("L7: "+l7); oldFont(lblL7);}
-			
-			if(l8>=4){if(l8>6){JOptionPane.showMessageDialog(null, warn);}lblL8.setText("L8: "+l8);	newFont(lblL8);}
-			else{lblL8.setText("L8: "+l8); oldFont(lblL8);}
-			
-			pst.close();
-			rs.close();
-			
-		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, "Line 418: "+e);
-		}
-	}
+//	public void seatsLeft(){
+//		String term = comboBoxTerm.getSelectedItem().toString();
+//		String day = comboBoxdays.getSelectedItem().toString();
+//		int l1=0,l2=0,l3=0,l4=0,l5=0,l6=0,l7=0,l8=0,splash=0,crash_front=0,crash_breast=0,team=0,adult=0;
+//		StringBuilder lvl01 = new StringBuilder("--------"+day+"------\n");
+//		StringBuilder lvl0 = new StringBuilder("Level 0:\n");
+//		StringBuilder lvl1 = new StringBuilder("Level 1:\n");
+//		StringBuilder lvl2 = new StringBuilder("Level 2:\n");
+//		StringBuilder lvl3 = new StringBuilder("Level 3:\n");
+//		StringBuilder lvl4 = new StringBuilder("Level 4:\n");
+//		StringBuilder lvl5 = new StringBuilder("Level 5:\n");
+//		StringBuilder lvl6 = new StringBuilder("Level 6:\n");
+//		StringBuilder lvl7 = new StringBuilder("Level 7:\n");
+//		StringBuilder lvl8 = new StringBuilder("Level 8:\n");
+//		StringBuilder lvl9 = new StringBuilder("Level Splash:\n");
+//		StringBuilder lvl10 = new StringBuilder("Level Crash_Front:\n");
+//		StringBuilder lvl11 = new StringBuilder("Level Crash_Breast:\n");
+//		StringBuilder lvl12 = new StringBuilder("Level Adult:\n");
+//		StringBuilder lvl13 = new StringBuilder("Level Team:\n");
+//		try {
+//			String query = "select t.sid, s.FirstName, s.LastName, s.CurLevel, t.day, t.time, t.line, t.coach from '"+term+"' t JOIN students s on s.sid = t.sid WHERE t.day = '"+day+ 
+//					"' ORDER BY t.day, t.time";
+//			PreparedStatement pst=conn.prepareStatement(query);
+//			ResultSet rs = pst.executeQuery();
+//			while(rs.next()){
+//				switch(rs.getString("CurLevel")){
+//				case "1_Swimmer 1": 
+//					l1++;
+//					lvl1.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+"  "+rs.getString("LastName")+"\n");
+//					break;
+//				case "2_Swimmer 2": 
+//					l2++;
+//					lvl2.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
+//					break;
+//				case "3_Swimmer 3": 
+//					l3++;
+//					lvl3.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
+//					break;
+//				case "4_Swimmer 4": 
+//					l4++;
+//					lvl4.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
+//					break;
+//				case "5_Swimmer 5": 
+//					l5++;
+//					lvl5.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
+//					break;
+//				case "6_Swimmer 6": 
+//					l6++;
+//					lvl6.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
+//					break;
+//				case "7_Swimmer 7": 
+//					l7++;
+//					lvl7.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
+//					break;
+//				case "8_Swimmer 8": 
+//					l8++;
+//					lvl8.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
+//					break;
+//				case "0_Swimmer 0":
+//					lvl0.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
+//					break;
+//				case "9_Splash":
+//					splash++;
+//					lvl9.append("      "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
+//					break;
+//				case "10_Crash-Front":
+//					crash_front++;
+//					lvl10.append("     "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
+//					break;
+//				case "11_Crash-Breast":
+//					crash_breast++;
+//					lvl11.append("     "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
+//					break;
+//				case "12_Adult":
+//					adult++;
+//					lvl12.append("     "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
+//					break;
+//				case "13_Team":
+//					team++;
+//					lvl13.append("     "+rs.getString("sid")+"  "+rs.getString("FirstName")+" "+rs.getString("LastName")+"\n");
+//					break;
+//				default:
+//					break;				
+//				}//switch
+//			}//while
+//			lvl01.append(lvl0);
+//			lvl01.append(lvl1);
+//			lvl01.append(lvl2);
+//			lvl01.append(lvl3);
+//			lvl01.append(lvl4);
+//			lvl01.append(lvl5);
+//			lvl01.append(lvl6);
+//			lvl01.append(lvl7);
+//			lvl01.append(lvl8);lvl01.append(lvl9);lvl01.append(lvl10);lvl01.append(lvl11);lvl01.append(lvl12);lvl01.append(lvl13);
+//			taInfo.setText(lvl01.toString());
+//			
+//			String warn="Exceed Class, and you won't be able to export an EXCEL File";
+//			if(splash>=4){if(splash>6){JOptionPane.showMessageDialog(null, warn);}lblSplash.setText("Splash: "+splash);	newFont(lblSplash);}
+//			else{lblSplash.setText("Splash: "+splash); oldFont(lblSplash);}
+//			
+//			if(crash_front>=4){if(crash_front>6){JOptionPane.showMessageDialog(null, warn);}lblCrashfront.setText("Crashfront: "+crash_front);newFont(lblCrashfront);}
+//			else{lblCrashfront.setText("Crashfront: "+crash_front); oldFont(lblCrashfront);}
+//			
+//			if(crash_breast>=4){if(crash_breast>6){JOptionPane.showMessageDialog(null, warn);}lblCrashbreast.setText("Crashbreast: "+crash_breast);newFont(lblCrashbreast);}
+//			else{lblCrashbreast.setText("Crashbreast: "+crash_breast); oldFont(lblCrashbreast);}
+//			
+//			if(adult>=4){if(adult>6){JOptionPane.showMessageDialog(null, warn);}lblAdult.setText("Adult: "+adult);newFont(lblAdult);}
+//			else{lblAdult.setText("Adult: "+adult); oldFont(lblAdult);}
+//			
+//			if(team>=4){if(team>6){JOptionPane.showMessageDialog(null, warn);}lblTeam.setText("Team: "+team);newFont(lblTeam);}
+//			else{lblTeam.setText("Team: "+team); oldFont(lblTeam);}
+//			
+//			if(l1>=4){if(l1>6){JOptionPane.showMessageDialog(null, warn);}lblL1.setText("L1: "+l1);	newFont(lblL1);}
+//			else{lblL1.setText("L1: "+l1); oldFont(lblL1);}
+//			
+//			if(l2>=4){if(l2>6){JOptionPane.showMessageDialog(null, warn);}lblL2.setText("L2: "+l2);	newFont(lblL2);}
+//			else{lblL2.setText("L2: "+l2); oldFont(lblL2);}
+//			
+//			if(l3>=4){if(l3>6){JOptionPane.showMessageDialog(null, warn);}lblL3.setText("L3: "+l3);	newFont(lblL3);}
+//			else{lblL3.setText("L3: "+l3); oldFont(lblL3);}
+//
+//			if(l4>=4){if(l4>6){JOptionPane.showMessageDialog(null, warn);}lblL4.setText("L4: "+l4);	newFont(lblL4);}
+//			else{lblL4.setText("L4: "+l4); oldFont(lblL4);}
+//			
+//			if(l5>=4){if(l5>6){JOptionPane.showMessageDialog(null, warn);}lblL5.setText("L5: "+l5);	newFont(lblL5);}
+//			else{lblL5.setText("L5: "+l5); oldFont(lblL5);}
+//			
+//			if(l6>=4){if(l6>6){JOptionPane.showMessageDialog(null, warn);}lblL6.setText("L6: "+l6);	newFont(lblL6);}
+//			else{lblL6.setText("L6: "+l6); oldFont(lblL6);}
+//			
+//			if(l7>=4){if(l7>6){JOptionPane.showMessageDialog(null, warn);}lblL7.setText("L7: "+l7);	newFont(lblL7);}
+//			else{lblL7.setText("L7: "+l7); oldFont(lblL7);}
+//			
+//			if(l8>=4){if(l8>6){JOptionPane.showMessageDialog(null, warn);}lblL8.setText("L8: "+l8);	newFont(lblL8);}
+//			else{lblL8.setText("L8: "+l8); oldFont(lblL8);}
+//			
+//			pst.close();
+//			rs.close();
+//			
+//		} catch (SQLException e) {
+//			JOptionPane.showMessageDialog(null, "Line 418: "+e);
+//		}
+	
+//	}
 	public void refreshSearch(){
 		try{
 			String key = comboBoxtable.getSelectedItem().toString();
@@ -682,12 +822,14 @@ public class ChacoSwim extends JFrame {
 				String termID = dbm.gotId("terms", term);
 				String locationID = dbm.gotId("location", location);
 				if(day.equals("All"))query="select s.email from 'active_record' a JOIN students s ON s.sid=a.sid WHERE a.termID = "+termID+" AND a.locationID = "+locationID+
-						" and s.email LIKE '%@%'";
+						" and s.email LIKE '%@%' GROUP BY a.sid";
 				else query="select s.email from 'active_record' a JOIN students s ON s.sid=a.sid WHERE a.day='"+day+"' AND a.termID = "+termID+" AND a.locationID = "+locationID+
-						" and s.email LIKE '%@%'";
+						" and s.email LIKE '%@%' GROUP BY a.sid";
 				pst=conn.prepareStatement(query);
 				rs=pst.executeQuery();
-				while(rs.next())address.add(rs.getString("email"));
+				while(rs.next()){
+					address.add(rs.getString("email"));
+				}
 				pst.close();
 				rs.close();
 			}
@@ -709,18 +851,79 @@ public class ChacoSwim extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public ChacoSwim(ChacoSwimMethods csp) {
-		this.csp = csp;
+	
+	public ChacoSwim() {
+		createView();
+		
+	}
+	
+	public void refreshOverTables(){
+		if(tglbtnSchedule.isSelected()){
+			csp.refreshTable("overbuttom2");
+			csp.refreshTable("jtTimeCount0");
+			csp.refreshTable("jtLineCount0");
+			
+		}
+		else {
+			csp.refreshTable("overbuttom");
+			csp.refreshTable("jtTimeCount");
+			csp.refreshTable("jtLineCount");
+		}
 	}
 	
 	
-	public ChacoSwim() {
+	public void initialValues(){
+		
+		cbSchTerm.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("terms", "cbSchTerm")));
+		cbSchLocation.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("location", "")));
+		cbSchDay.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("day", "")));
+		//schedule tab
+		int i = csp.fillComboBox("lines","cbSchLocation").length-1;
+		if(i<6) ScheduleTab.remove(schLine6);
+		else if(schLine6.getParent()==null)ScheduleTab.add(schLine6, "sg panels");
+		
+		//terms
+		comboBoxTerm.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("terms", "")));
+		comboBoxStTerm.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("terms", "")));
+		comboBoxEmailTerm.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("terms", "")));
+		comboBoxStaTerm.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("terms", "")));
+		comboBoxExTerm.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("terms", "")));
+		//location
+		comboBoxLocation.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("location", "")));
+		comboBoxStLoc.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("location", "")));
+		comboBoxEmailLoc.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("location", "")));
+		comboBoxExLoc.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("location", "")));
+		
+		//lines
+		comboBoxLine.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("lines","comboBoxLocation")));
+		
+		sps1.getComboBox().setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("coach", "")));
+		sps2.getComboBox().setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("coach", "")));
+		sps3.getComboBox().setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("coach", "")));
+		sps4.getComboBox().setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("coach", "")));
+		sps5.getComboBox().setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("coach", "")));
+		sps6.getComboBox().setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("coach", "")));
+		
+		sps1.getComboBoxLevel().setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("level", "")));
+		sps2.getComboBoxLevel().setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("level", "")));
+		sps3.getComboBoxLevel().setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("level", "")));
+		sps4.getComboBoxLevel().setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("level", "")));
+		sps5.getComboBoxLevel().setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("level", "")));
+		sps6.getComboBoxLevel().setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("level", "")));
+		
+		cbSchStart.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("time", "")));
+		cbSchEnd.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("time", "")));
+	}
+	
+	/**
+	 * TODO initiate view
+	 */
+	private void createView(){
 		setResizable(true);
 		conn=sqliteConnection.dbConnector();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		setBounds(0, -10, 1300, 768);
-		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -794,8 +997,10 @@ public class ChacoSwim extends JFrame {
 		comboBoxdays = new JComboBox<Object>();
 		comboBoxdays.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				refreshTableTerm();
-				//seatsLeft();
+//				if(tglbtnSchedule.isSelected())csp.refreshTable("overbuttom2");
+//				else csp.refreshTable("overbuttom");
+				refreshOverTables();
+				lblTotal.setText("Total: "+String.valueOf(tableTerm.getRowCount()));
 			}
 		});
 		comboBoxdays.setModel(new DefaultComboBoxModel<Object>(new String[] {"All", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"}));
@@ -808,6 +1013,7 @@ public class ChacoSwim extends JFrame {
 				String id = updateSID();
 				if(!id.isEmpty()){
 					CourseModification.main(new String[]{"add",id,comboBoxTerm.getSelectedItem().toString(),comboBoxLocation.getSelectedItem().toString()},btnRefreshAll);
+					lblTotal.setText("Total: "+String.valueOf(tableTerm.getRowCount()));
 				}
 				else
 					JOptionPane.showMessageDialog(null, "Please select a record first");
@@ -821,11 +1027,18 @@ public class ChacoSwim extends JFrame {
 		JButton btnDeleteStudent = new JButton("Delete");
 		btnDeleteStudent.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				int a = JOptionPane.showConfirmDialog(null, "Do You Really Want to Delete the Selected Record?","Delete",JOptionPane.YES_NO_OPTION);
-				if (a==JOptionPane.YES_OPTION){
-					deleteStudent();
-					refreshTable(table,"overall");
+				
+				int row = table.getSelectedRow();
+				if(row!=-1){
+					int a = JOptionPane.showConfirmDialog(null, "Do You Really Want to Delete the Selected Record?","Delete",JOptionPane.YES_NO_OPTION);
+					if (a==JOptionPane.YES_OPTION){
+						deleteStudent();
+						csp.refreshTable("overtop");
+						
+					}
 				}
+				else
+					JOptionPane.showMessageDialog(null, "Please select a valid row first");
 			}
 		});
 		btnDeleteStudent.setIcon(new ImageIcon(new ImageIcon(this.getClass().getResource("/24delete.png")).getImage()));
@@ -838,7 +1051,13 @@ public class ChacoSwim extends JFrame {
 				int row = tableTerm.getSelectedRow();
 				if(row!=-1){
 					String id = tableTerm.getModel().getValueAt(row, 0).toString();
-					CourseModification.main(new String[]{"update",id,comboBoxTerm.getSelectedItem().toString(),comboBoxLocation.getSelectedItem().toString()},btnRefreshAll);
+					if(tglbtnSchedule.isSelected()){
+						CourseModification.main(new String[]{"update",id,comboBoxTerm.getSelectedItem().toString(),comboBoxLocation.getSelectedItem().toString()},btnRefreshAll);
+					}
+					else{
+						
+						CourseModification.main(new String[]{"update",id,comboBoxTerm.getSelectedItem().toString(),comboBoxLocation.getSelectedItem().toString()},btnRefreshAll);						
+					}
 				}
 				else{
 					JOptionPane.showMessageDialog(null, "Please select a record from course table first");
@@ -887,13 +1106,17 @@ public class ChacoSwim extends JFrame {
 		resizeColumnWidth(table);
 		
 		
-		comboBoxTerm = new JComboBox<Object>();
+		comboBoxTerm = new JComboBox<String>();
 		comboBoxTerm.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				refreshTableTerm();
+//				if(tglbtnSchedule.isSelected())csp.refreshTable("overbuttom2");
+//				else csp.refreshTable("overbuttom");
+				refreshOverTables();
+				
+				lblTotal.setText("Total: "+String.valueOf(tableTerm.getRowCount()));
 			}
 		});
-		comboBoxTerm.setModel(new DefaultComboBoxModel<Object>(getTables("terms")));
+//		comboBoxTerm.setModel(new DefaultComboBoxModel<Object>(getTables("terms")));
 		comboBoxTerm.setBounds(20, 314, 119, 20);
 		
 		panel.add(comboBoxTerm);
@@ -905,78 +1128,6 @@ public class ChacoSwim extends JFrame {
 		JLabel lblCourseInfo = new JLabel("Course Info: ");
 		lblCourseInfo.setBounds(20, 356, 117, 20);
 		panel.add(lblCourseInfo);
-		
-		JScrollPane scrollPane_3 = new JScrollPane();
-		scrollPane_3.setBounds(968, 280, 234, 295);
-		panel.add(scrollPane_3);
-		
-		taInfo = new JTextArea();
-		taInfo.setEditable(false);
-		scrollPane_3.setViewportView(taInfo);
-		
-		lblL1 = new JLabel("L1:");
-		lblL1.setForeground(Color.BLACK);
-		lblL1.setBounds(796, 316, 64, 17);
-		panel.add(lblL1);
-		
-		lblL2 = new JLabel("L2:");
-		lblL2.setBounds(854, 316, 64, 17);
-		panel.add(lblL2);
-		
-		lblL3 = new JLabel("L3:");
-		lblL3.setBounds(909, 316, 64, 17);
-		panel.add(lblL3);
-		
-		lblL4 = new JLabel("L4:");
-		lblL4.setBounds(796, 344, 64, 17);
-		panel.add(lblL4);
-		
-		lblL5 = new JLabel("L5:");
-		lblL5.setBounds(854, 344, 64, 17);
-		panel.add(lblL5);
-		
-		lblL6 = new JLabel("L6:");
-		lblL6.setBounds(909, 344, 64, 17);
-		panel.add(lblL6);
-		
-		lblL7 = new JLabel("L7:");
-		lblL7.setBounds(796, 372, 64, 17);
-		panel.add(lblL7);
-		
-		lblL8 = new JLabel("L8:");
-		lblL8.setBounds(854, 372, 64, 17);
-		panel.add(lblL8);
-		
-		lblSplash = new JLabel("Splash:");
-		lblSplash.setForeground(Color.BLACK);
-		lblSplash.setBounds(796, 400, 64, 17);
-		panel.add(lblSplash);
-		
-		lblCrashfront = new JLabel("Crash_Front:");
-		lblCrashfront.setForeground(Color.BLACK);
-		lblCrashfront.setBounds(796, 430, 105, 17);
-		panel.add(lblCrashfront);
-		
-		lblCrashbreast = new JLabel("Crash_Breast:");
-		lblCrashbreast.setForeground(Color.BLACK);
-		lblCrashbreast.setBounds(796, 458, 107, 17);
-		panel.add(lblCrashbreast);
-		
-		lblAdult = new JLabel("Adult:");
-		lblAdult.setForeground(Color.BLACK);
-		lblAdult.setBounds(882, 400, 64, 17);
-		panel.add(lblAdult);
-		
-		lblTeam = new JLabel("Team:");
-		lblTeam.setForeground(Color.BLACK);
-		lblTeam.setBounds(796, 486, 64, 17);
-		panel.add(lblTeam);
-		
-		
-		
-		JLabel lblSeatsRemaining = new JLabel("Seats Info:");
-		lblSeatsRemaining.setBounds(796, 286, 100, 14);
-		panel.add(lblSeatsRemaining);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
 		scrollPane_1.setBounds(20, 380, 769, 192);
@@ -999,12 +1150,22 @@ public class ChacoSwim extends JFrame {
 		
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String term = comboBoxTerm.getSelectedItem().toString();
-				PreparedStatement pst=null;
-				String query = "DELETE FROM 'active_record' WHERE ID = ?1";
+				//String term = comboBoxTerm.getSelectedItem().toString();
+				//PreparedStatement pst=null;
+				//String query = "DELETE FROM 'active_record' WHERE ID = ?1";
 				int row = tableTerm.getSelectedRow();
-				String id = tableTerm.getModel().getValueAt(row, 0).toString();
+				if(row!=-1){
+					String id = tableTerm.getModel().getValueAt(row, 0).toString();
+					csp.deleteRow(id, "active_record");
+					if(tglbtnSchedule.isSelected())csp.refreshTable("overbuttom2");
+					else csp.refreshTable("overbuttom");
+					lblTotal.setText("Total: "+String.valueOf(tableTerm.getRowCount()));
+				}
+				else
+					JOptionPane.showMessageDialog(null, "Please select a valid row first");
+				
 				//JOptionPane.showMessageDialog(null, id);
+				/*
 				int ans = JOptionPane.showConfirmDialog(null, "Do you really want to delete selected record","Deleting",JOptionPane.YES_NO_OPTION);
 				if(ans==JOptionPane.YES_OPTION){
 					try {
@@ -1018,29 +1179,38 @@ public class ChacoSwim extends JFrame {
 					} catch (SQLException e) {
 						JOptionPane.showMessageDialog(null,"Line912: "+ e);
 					}
+					
 				
-				}
+				}*/
+				
 				
 			}
 		});
 		btnDelete.setBounds(422, 583, 119, 30);
 		panel.add(btnDelete);
-		
+		/**
+		 * TODO refreshAll btn
+		 */
 		btnRefreshAll = new JButton("Refresh All");
 		btnRefreshAll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				refreshTable(table,"overall");
-				refreshTableTerm();
+//				refreshTable(table,"overall");
+//				refreshTableTerm();
+				csp.refreshTable("overtop");
+				
+				refreshOverTables();
+				
+				lblTotal.setText("Total: "+String.valueOf(tableTerm.getRowCount()));
 				//seatsLeft();
 			}
 		});
 		
 		Image img=new ImageIcon(this.getClass().getResource("/refresh-all.png")).getImage();
 		btnRefreshAll.setIcon(new ImageIcon(img));
-		btnRefreshAll.setBounds(625, 297, 145, 37);
+		btnRefreshAll.setBounds(619, 276, 145, 37);
 		panel.add(btnRefreshAll);
 		
-		tglbtnSchedule = new JToggleButton("Schedule");
+		tglbtnSchedule = new JToggleButton("   Schedule");
 		tglbtnSchedule.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(tglbtnSchedule.isSelected()){
@@ -1051,12 +1221,10 @@ public class ChacoSwim extends JFrame {
 					tglbtnSchedule.setIcon(new ImageIcon(new ImageIcon(this.getClass().getResource("/32megaphone2.png")).getImage()));
 					tglbtnSchedule.setText("Students");
 				}
-				
-				refreshTable(table,"overall");
 			}
 		});
 		tglbtnSchedule.setIcon(new ImageIcon(new ImageIcon(this.getClass().getResource("/32megaphone2.png")).getImage()));
-		tglbtnSchedule.setBounds(682, 11, 107, 35);
+		tglbtnSchedule.setBounds(619, 322, 145, 37);
 		panel.add(tglbtnSchedule);
 		
 		JButton btnLevelup = new JButton("Level Up");
@@ -1105,10 +1273,16 @@ public class ChacoSwim extends JFrame {
 		panel.add(lblLocation);
 		
 		comboBoxLocation = new JComboBox<String>();
-		comboBoxLocation.setModel(new DefaultComboBoxModel<String>(getTables("location")));
+//		comboBoxLocation.setModel(new DefaultComboBoxModel<String>(getTables("location")));
 		comboBoxLocation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				refreshTableTerm();
+//				if(tglbtnSchedule.isSelected())csp.refreshTable("overbuttom2");
+//				else csp.refreshTable("overbuttom");
+				refreshOverTables();
+				
+				comboBoxLine.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("lines","comboBoxLocation")));
+//				initialValues();
+				lblTotal.setText("Total: "+String.valueOf(tableTerm.getRowCount()));
 			}
 		});
 		comboBoxLocation.setBounds(176, 314, 129, 20);
@@ -1118,9 +1292,56 @@ public class ChacoSwim extends JFrame {
 		labelLine.setBounds(478, 292, 46, 14);
 		panel.add(labelLine);
 		
-		JComboBox<String> comboBoxLine = new JComboBox<String>();
+		comboBoxLine = new JComboBox<String>();
+		
 		comboBoxLine.setBounds(478, 311, 119, 20);
+		comboBoxLine.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+//				if(tglbtnSchedule.isSelected())csp.refreshTable("overbuttom2");
+//				else csp.refreshTable("overbuttom");
+				refreshOverTables();
+				lblTotal.setText("Total: "+String.valueOf(tableTerm.getRowCount()));
+			}
+			
+		});
 		panel.add(comboBoxLine);
+		
+		lblTotal = new JLabel("Total: ");
+		lblTotal.setBounds(640, 589, 149, 16);
+		panel.add(lblTotal);
+		
+		btnReload = new JButton("Reload All");
+		btnReload.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int ans = JOptionPane.showConfirmDialog(null, "Do you want to reinitial all elements?\n(Click YES when you add or delete any terms or locations or imported new database)", "Confirmation", JOptionPane.YES_NO_OPTION);
+				if(ans == JOptionPane.YES_OPTION){
+					initialValues();
+				}
+				
+				
+			}
+			
+		});
+		btnReload.setBounds(635, 8, 129, 37);
+		//panel.add(btnReload);
+		
+		JScrollPane scrollPane_3 = new JScrollPane();
+		scrollPane_3.setBounds(826, 276, 377, 128);
+		panel.add(scrollPane_3);
+		
+		jtTimeCount = new JTable();
+		scrollPane_3.setViewportView(jtTimeCount);
+		
+		JScrollPane scrollPane_11 = new JScrollPane();
+		scrollPane_11.setBounds(825, 444, 378, 128);
+		panel.add(scrollPane_11);
+		
+		jtLineCount = new JTable();
+		scrollPane_11.setViewportView(jtLineCount);
 
 //Start Students Tab-----------------------TODO StudentTab
 		JPanel StudentsTab = new JPanel();
@@ -1158,14 +1379,14 @@ public class ChacoSwim extends JFrame {
 				refreshTable(jtSt,"students");
 			}
 		});
-		comboBoxStTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
+//		comboBoxStTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
 		comboBoxStLoc = new JComboBox<String>();
 		comboBoxStLoc.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				refreshTable(jtSt,"students");
 			}
 		});
-		comboBoxStLoc.setModel(new DefaultComboBoxModel<String>(getTables("location")));
+//		comboBoxStLoc.setModel(new DefaultComboBoxModel<String>(getTables("location")));
 		comboBoxStDay = new JComboBox<String>();
 		comboBoxStDay.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1196,6 +1417,23 @@ public class ChacoSwim extends JFrame {
 		rtTA.setEditable(false);
 		rt.add(rtTA,"sg rttf,w :70:,growx");
 		rtRList = new JButton("Show Detail");
+		rtRList.addActionListener(new ActionListener(){
+			
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try{
+					retake = Integer.parseInt(rtRC.getText());
+					if(retake>0){
+						csp.refreshTable("studentRetake");
+					}
+					
+				}catch(NumberFormatException ex){
+					JOptionPane.showMessageDialog(null, "Please enter a valid number");
+				}
+			}
+			
+		});
 		rt.add(rtRList,"wrap,w 100!,skip");
 		//rt #3
 		rt.add(new JLabel("Unpaid number:"));
@@ -1240,7 +1478,7 @@ public class ChacoSwim extends JFrame {
 		
 		jtSt.setModel(new DefaultTableModel());
 		//jtSt.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-		resizeColumnWidth(jtSt);
+		//resizeColumnWidth(jtSt);
 		JScrollPane scrollPane_10 = new JScrollPane();
 		scrollPane_10.setViewportView(jtSt);
 		//panelSt.add(scrollPane_10, "w 200:1000:,h 100:300:,span,grow,gaptop 10,pushx");
@@ -1299,21 +1537,12 @@ public class ChacoSwim extends JFrame {
 				PreparedStatement pst=null;
 				String query = "DELETE FROM 'active_record' WHERE ID = ?1";
 				int row = jtSt.getSelectedRow();
-				String id = jtSt.getModel().getValueAt(row, 0).toString();
-				//JOptionPane.showMessageDialog(null, id);
-				int ans = JOptionPane.showConfirmDialog(null, "Do you really want to delete selected record","Deleting",JOptionPane.YES_NO_OPTION);
-				if(ans==JOptionPane.YES_OPTION){
-					try {
-
-						pst = conn.prepareStatement(query);
-						pst.setString(1, id);
-						pst.execute();
-						pst.close();
-						JOptionPane.showMessageDialog(null, "Deleted");
-					} catch (SQLException e) {
-						JOptionPane.showMessageDialog(null,"Line912: "+ e);
-					}
+				if (row != -1){
+					String id = jtSt.getModel().getValueAt(row, 0).toString();
+					csp.deleteRow(id, "active_record");
 				}
+				
+				
 				refreshTable(jtSt,"students");
 			}
 		});
@@ -1327,27 +1556,116 @@ public class ChacoSwim extends JFrame {
 		StudentsTab.add(rt,"span,grow,wrap");
 		StudentsTab.add(middle,"wrap,span,grow");
 		StudentsTab.add(panelStEdit,"span,grow");
-		
-		
-		
-		/*
-		
-		
-		
-		panelSt.add(new JButton("Term"),"flowy,cell 1 0,sizegroupx 1,sizegroupy 1,aligny top");
-		panelSt.add(new JButton("Location"),"cell 1 0,sizegroupx 1,sizegroupy 1");
-		panelSt.add(new JButton("Day"),"cell 1 0,sizegroupx 1,sizegroupy 1");
-		
-		
-		
-		JLabel lblSearchBy_1 = new JLabel("Search by: ");
-		panelSt.add(lblSearchBy_1, "flowx,cell 0 1");
-		*/
-		
+	
 //End Students Tab------------------------		
 		
+//TODO Schedule Panel-----------------
+		ScheduleTab = new JPanel();
+		tabbedPane.addTab("Schedule",null,ScheduleTab,null);
+		ScheduleTab.setLayout(new MigLayout());
+		
+		//TOP sch pane
+		JPanel schTop = new JPanel(new MigLayout("","[]10[]",""));
+		schTop.setBorder(BorderFactory.createTitledBorder("Setting"));
+		ScheduleTab.add(schTop, "growx,span,wrap");
+		//TOP ROW #1
+		schTop.add(new JLabel("Term: "),"sg schlbl");
+		schTop.add(new JLabel("Location: "),"sg schlbl");
+		schTop.add(new JLabel("Day: "),"sg schlbl");
+		schTop.add(new JLabel("Start: "),"sg time");
+		cbSchStart = new JComboBox<String>();
+		schTop.add(cbSchStart);
+		
+		schTop.add(new JLabel("History: "),"gapleft 20");
+		cbSchHistory = new JComboBox<String>();
+		schTop.add(cbSchHistory,"wrap");
+		
+		cbSchTerm = new JComboBox<String>();
+		cbSchLocation = new JComboBox<String>();
+		cbSchLocation.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int i = csp.fillComboBox("lines","cbSchLocation").length-1;
+				if(i<6) 
+					ScheduleTab.remove(schLine6);
+				else if(schLine6.getParent()==null)
+					ScheduleTab.add(schLine6, "sg panels");
+				JOptionPane.showMessageDialog(null, i+" lines in this location");
+				
+				
+			}
+			
+		});
+		cbSchDay = new JComboBox<String>();
+		
+		schTop.add(cbSchTerm,"sg schlbl");
+		schTop.add(cbSchLocation,"sg schlbl");
+		schTop.add(cbSchDay,"sg schlbl");
+		schTop.add(new JLabel("End: "),"sg time");
+		cbSchEnd = new JComboBox<String>();
+		schTop.add(cbSchEnd);
+		
+		JButton schLoad = new JButton("Load");
+		schLoad.setEnabled(false);
+		schTop.add(schLoad,"width 80!,gapleft 20");
+		
+		JButton schUpdate = new JButton("Update");
+		schUpdate.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int a = JOptionPane.showConfirmDialog(null, "Please confirm the schedule is correctly setted", "Confirmation", JOptionPane.YES_NO_OPTION);
+				if(a == JOptionPane.YES_OPTION){
+					csp.updateScheduleForm();
+					
+				}
+				
+			}
+			
+		});
+		schTop.add(schUpdate,"alignx right,width 80!");
+		
+		//Line #1 panel
+				JPanel schLine1 = new JPanel(new MigLayout("","",""));
+				schLine1.setBorder(BorderFactory.createTitledBorder("Line #1"));
+				ScheduleTab.add(schLine1,"sg panels,split 3");
+				sps1 = new SchedulePanels(schLine1);
+		
+		
+		//Line #2 panel
+				JPanel schLine2 = new JPanel(new MigLayout("","",""));
+				schLine2.setBorder(BorderFactory.createTitledBorder("Line #2"));
+				ScheduleTab.add(schLine2,"sg panels");
+				sps2 = new SchedulePanels(schLine2);
+				
+		//Line #3 panel
+				JPanel schLine3 = new JPanel(new MigLayout("","",""));
+				schLine3.setBorder(BorderFactory.createTitledBorder("Line #3"));
+				ScheduleTab.add(schLine3,"sg panels,wrap");
+				sps3 = new SchedulePanels(schLine3);
+				
+		//Line #4		
+				JPanel schLine4 = new JPanel(new MigLayout("","",""));
+				schLine4.setBorder(BorderFactory.createTitledBorder("Line #4"));
+				ScheduleTab.add(schLine4,"sg panels,split 3");
+				sps4 = new SchedulePanels(schLine4);
+		//Line #5		
+				JPanel schLine5 = new JPanel(new MigLayout("","",""));
+				schLine5.setBorder(BorderFactory.createTitledBorder("Line #5"));
+				ScheduleTab.add(schLine5,"sg panels");
+				sps5 = new SchedulePanels(schLine5);
+		//Line #6		
+				schLine6 = new JPanel(new MigLayout("","",""));
+				schLine6.setBorder(BorderFactory.createTitledBorder("Line #6"));
+				ScheduleTab.add(schLine6,"sg panels");
+				sps6 = new SchedulePanels(schLine6);
+		
+				
+				
+		
+//END Scedule Panel-------------------		
+		
 //Start Tab Coach~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		JPanel CoachTab = new JPanel();
+		CoachTab = new JPanel();
 		tabbedPane.addTab("Coaches", null, CoachTab, null);
 		CoachTab.setLayout(null);
 		
@@ -1487,25 +1805,26 @@ public class ChacoSwim extends JFrame {
 				
 				Properties props= new Properties();
 				
-/* Gmail
+// Gmail
 				props.put("mail.smtp.host", "smtp.gmail.com");
 				props.put("mail.smtp.socketFactory.port", "465");
 				props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 				props.put("mail.smtp.auth", "true");
 				props.put("mail.smtp.port", "465");
 				
-*/
-				props.setProperty("mail.transport.protocol", "stmp");
-				props.setProperty("mail.host", "smtp.live.com");
-			    props.put("mail.smtp.starttls.enable", "true");
-			    props.put("mail.smtp.auth", "true");
-			    props.put("mail.smtp.port", "587");
+
+//hotmail
+//				props.setProperty("mail.transport.protocol", "stmp");
+//				props.setProperty("mail.host", "smtp.live.com");
+//			    props.put("mail.smtp.starttls.enable", "true");
+//			    props.put("mail.smtp.auth", "true");
+//			    props.put("mail.smtp.port", "587");
 			    
 				Session session = Session.getDefaultInstance(props,
 						new javax.mail.Authenticator(){
 							protected PasswordAuthentication getPasswordAuthentication(){
-								//return new PasswordAuthentication("andrew198712@gmail.com","zz208516");
-								return new PasswordAuthentication("wenzhong.zheng@hotmail.com","208516Zz");
+								return new PasswordAuthentication("andrew198712@gmail.com","zz208516");
+//								return new PasswordAuthentication("wenzhong.zheng@hotmail.com","208516Zz");
 							}
 						}
 						);
@@ -1520,7 +1839,8 @@ public class ChacoSwim extends JFrame {
 					if(address.length==1)message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(address[0].toString()));
 					else if(address.length>1){
 						for(String i:address){
-							addressString=addressString+","+i;
+							if(addressString.isEmpty())addressString = i;
+							else addressString=addressString+","+i;
 						}
 						message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(addressString));
 					}
@@ -1542,10 +1862,12 @@ public class ChacoSwim extends JFrame {
 						attachment_PathList.clear();
 						refreshListAttachment();
 					}
-					
-					JOptionPane.showMessageDialog(null, "This process may take up to a few minutes depends on the number of recipients,Please be patient.");
-					Transport.send(message);
-					JOptionPane.showMessageDialog(null, "Message sent");
+					int ans = JOptionPane.showConfirmDialog(null, "Do you want to send this email?", "Confirmation", JOptionPane.YES_NO_OPTION);
+					if(ans == JOptionPane.YES_OPTION){
+						JOptionPane.showMessageDialog(null, "This process may take up to a few minutes depends on the number of recipients,Please be patient.");
+						Transport.send(message);
+						JOptionPane.showMessageDialog(null, "Message sent");
+					}
 				}catch(Exception e){
 					JOptionPane.showMessageDialog(null,"Line1198: "+ e);
 				}
@@ -1621,7 +1943,7 @@ public class ChacoSwim extends JFrame {
 			}
 		});
 		buttonGroup.add(rdbtnMultipleRecipients);
-		rdbtnMultipleRecipients.setBounds(303, 20, 138, 23);
+		rdbtnMultipleRecipients.setBounds(303, 20, 160, 23);
 		EmailTab.add(rdbtnMultipleRecipients);
 		
 		JSeparator separator_1 = new JSeparator();
@@ -1653,7 +1975,7 @@ public class ChacoSwim extends JFrame {
 		EmailTab.add(rdbtnStudents);
 		
 		JLabel lblsec2 = new JLabel("When multiple recipients applied: ");
-		lblsec2.setBounds(79, 63, 196, 14);
+		lblsec2.setBounds(79, 63, 258, 14);
 		EmailTab.add(lblsec2);
 		
 		JSeparator separator_2 = new JSeparator();
@@ -1666,10 +1988,10 @@ public class ChacoSwim extends JFrame {
 		
 		comboBoxEmailTerm = new JComboBox<String>();
 		comboBoxEmailTerm.setBounds(217, 159, 183, 23);
-		comboBoxEmailTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
+//		comboBoxEmailTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
 		EmailTab.add(comboBoxEmailTerm);
 		
-		comboBoxEmailLoc = new JComboBox<String>(new DefaultComboBoxModel<String>(getTables("location")));
+		comboBoxEmailLoc = new JComboBox<String>();
 		comboBoxEmailLoc.setEnabled(false);
 		comboBoxEmailLoc.setBounds(217, 193, 183, 23);
 		EmailTab.add(comboBoxEmailLoc);
@@ -1717,7 +2039,7 @@ public class ChacoSwim extends JFrame {
 		EmailTab.add(btnAttachFile);
 		
 		JLabel lblAttachmentManage = new JLabel("Attachment Manage:");
-		lblAttachmentManage.setBounds(79, 265, 128, 14);
+		lblAttachmentManage.setBounds(79, 265, 183, 14);
 		EmailTab.add(lblAttachmentManage);
 		
 		rdbtnStudents.setEnabled(false);
@@ -1803,7 +2125,7 @@ public class ChacoSwim extends JFrame {
 		EmailTab.add(btnCopy);
 		
 		JLabel lblOrYouCould = new JLabel("Or you could copy the selected address to cliperboard");
-		lblOrYouCould.setBounds(80, 537, 320, 29);
+		lblOrYouCould.setBounds(80, 537, 371, 29);
 		EmailTab.add(lblOrYouCould);
 		
 		JSeparator separator_6 = new JSeparator();
@@ -1835,7 +2157,7 @@ public class ChacoSwim extends JFrame {
 		
 		JLabel lblStudentsNumberBased = new JLabel("Students number based on term: ");
 		lblStudentsNumberBased.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		lblStudentsNumberBased.setBounds(49, 128, 251, 23);
+		lblStudentsNumberBased.setBounds(49, 131, 251, 23);
 		StatisticsTab.add(lblStudentsNumberBased);
 		
 		comboBoxStaTerm = new JComboBox<String>();
@@ -1851,8 +2173,8 @@ public class ChacoSwim extends JFrame {
 				btnSunday.setText(sm.getDays("Sunday"));
 			}
 		});
-		comboBoxStaTerm.setBounds(311, 129, 178, 23);
-		comboBoxStaTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
+		comboBoxStaTerm.setBounds(312, 132, 178, 23);
+//		comboBoxStaTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
 		StatisticsTab.add(comboBoxStaTerm);
 		
 		btnMonday = new JButton("Monday:");
@@ -1916,8 +2238,11 @@ public class ChacoSwim extends JFrame {
 				new StatisticMethod().fillTerm_Day(StaticTerm_Day, comboBoxStaTerm.getSelectedItem().toString(), "Sunday");
 			}
 		});
-		btnSunday.setBounds(49, 282, 129, 23);
+		btnSunday.setBounds(49, 284, 129, 23);
 		StatisticsTab.add(btnSunday);
+		btnMonday.setEnabled(false);btnTuesday.setEnabled(false);btnWednesday.setEnabled(false);
+		btnThursday.setEnabled(false);btnFriday.setEnabled(false);btnSaturday.setEnabled(false);
+		btnSunday.setEnabled(false);
 		
 		JLabel lblStudentsNumberBased_1 = new JLabel("Students number based on term and coach: ");
 		lblStudentsNumberBased_1.setFont(new Font("Tahoma", Font.PLAIN, 13));
@@ -1932,8 +2257,8 @@ public class ChacoSwim extends JFrame {
 				String[] coachListData = new StatisticMethod().getCoaches_Term(comboBoxStaCoach.getSelectedItem().toString());
 				for(String i:coachListData){
 					listCoachModel.addElement(i);
-					listCoach.setModel(listCoachModel);
 				}
+				listCoach.setModel(listCoachModel);
 				
 			}
 		});
@@ -2012,11 +2337,11 @@ public class ChacoSwim extends JFrame {
 					if(ans==JFileChooser.APPROVE_OPTION){
 						File file = chooser.getSelectedFile();
 						if(file.getName().endsWith(".xlsx")){						
-							new WriteToExcel(file,comboBoxExTerm.getSelectedItem().toString(),comboBoxExLoc.getSelectedItem().toString(),comboBoxExDay.getSelectedItem().toString()).startWrite();
+							new WriteToExcel(file,comboBoxExTerm.getSelectedItem().toString(),comboBoxExLoc.getSelectedItem().toString(),comboBoxExDay.getSelectedItem().toString(),chckCondition.isSelected()).startWrite();
 						}
 						else{
 							File file1 = new File(file.getAbsolutePath()+".xlsx");
-							new WriteToExcel(file1,comboBoxExTerm.getSelectedItem().toString(),comboBoxExLoc.getSelectedItem().toString(),comboBoxExDay.getSelectedItem().toString()).startWrite();
+							new WriteToExcel(file1,comboBoxExTerm.getSelectedItem().toString(),comboBoxExLoc.getSelectedItem().toString(),comboBoxExDay.getSelectedItem().toString(),chckCondition.isSelected()).startWrite();
 						}
 						//then write to excel file
 						
@@ -2046,7 +2371,7 @@ public class ChacoSwim extends JFrame {
 				refreshExTableTerm();
 			}
 		});
-		comboBoxExTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
+//		comboBoxExTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
 		comboBoxExTerm.setBounds(981, 89, 175, 23);
 		Export.add(comboBoxExTerm);
 		
@@ -2054,7 +2379,7 @@ public class ChacoSwim extends JFrame {
 		lblSelectLocation.setBounds(863, 123, 108, 23);
 		Export.add(lblSelectLocation);
 		
-		comboBoxExLoc = new JComboBox<String>(new DefaultComboBoxModel<String>(getTables("location")));
+		comboBoxExLoc = new JComboBox<String>();
 		comboBoxExLoc.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				refreshExTableTerm();
@@ -2176,7 +2501,7 @@ public class ChacoSwim extends JFrame {
 								os.flush();
 								os.close();
 								
-								comboBoxTerm.setModel(new DefaultComboBoxModel<Object>(getTables("terms")));
+								comboBoxTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
 								comboBoxEmailTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
 								comboBoxStaTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
 								comboBoxExTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
@@ -2198,6 +2523,23 @@ public class ChacoSwim extends JFrame {
 		btnImportSqliteFile.setFont(new Font("Tahoma", Font.BOLD, 13));
 		btnImportSqliteFile.setBounds(646, 441, 153, 33);
 		Export.add(btnImportSqliteFile);
+		
+		JLabel lblSchedule = new JLabel("Schedule: ");
+		lblSchedule.setBounds(863, 193, 108, 16);
+		Export.add(lblSchedule);
+		
+		chckCondition = new JCheckBox("Empty Class Only");
+		chckCondition.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				refreshExTableTerm();
+				
+			}
+			
+		});
+		chckCondition.setBounds(981, 192, 175, 23);
+		Export.add(chckCondition);
 		
 		
 		
@@ -2230,10 +2572,10 @@ public class ChacoSwim extends JFrame {
 				switch(str){
 				case "Terms":
 					/* Set right pane for terms */
-					splitPane.setRightComponent(new SettingPane().getTerms());
+					splitPane.setRightComponent(new SettingPane(ChacoSwim.this).getTerms());
 					break;
 				case "Locations":
-					splitPane.setRightComponent(new SettingPane().getLocations());
+					splitPane.setRightComponent(new SettingPane(ChacoSwim.this).getLocations());
 					break;
 				default:
 					break;
@@ -2243,19 +2585,115 @@ public class ChacoSwim extends JFrame {
 		});
 		
 		splitPane.setLeftComponent(list);
-		splitPane.setRightComponent(new SettingPane().getTerms());
-		
-		
-
-
-/* Set right pane for locations */	
-		
-		
-//		refreshTable();
-//		refreshTableTerm();
+		splitPane.setRightComponent(new SettingPane(this).getTerms());
 	
-//		seatsLeft();
 		
+	}
+	/**
+	 * TODO SchedulePanels
+	 * @author wenzhongzheng
+	 *
+	 */
+	public class SchedulePanels{
+		private JPanel panel;
+		private JComboBox<String> cbschLine2;
+		private JTextField tfschLine2;
 		
+		private JComboBox<String> cbschlevel;
+		private JTextField tfschlevel;
+		public SchedulePanels(JPanel panel){
+			this.panel = panel;
+			initialPanel();
+		}
+		
+		public JTextField gettfschlevel() {
+			return tfschlevel;
+		}
+		public JTextField gettfschLine2() {
+			return tfschLine2;
+		}
+		public JComboBox<String> getComboBox(){
+			return cbschLine2;
+		}
+		public JComboBox<String> getComboBoxLevel(){
+			return cbschlevel;
+		}
+		private void initialPanel(){
+			//ROW #1
+			JLabel schlbl1 = new JLabel("Coach: ");
+			panel.add(schlbl1,"sg line1");
+			
+			cbschLine2 = new JComboBox<String>();
+			panel.add(cbschLine2,"growx,wrap");
+			
+			JLabel schlbl2 = new JLabel("Selected Coach(es): ");
+			panel.add(schlbl2,"sg line1");
+			
+			tfschLine2 = new JTextField();
+			tfschLine2.setEditable(false);
+			panel.add(tfschLine2,"growx,width 80:150:,wrap");
+			
+			//ROW #2
+			JButton schLine2Add = new JButton("Add");
+			schLine2Add.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if(tfschLine2.getText().isEmpty())
+						tfschLine2.setText(cbschLine2.getSelectedItem().toString());
+//					else if(!tfschLine2.getText().contains((cbschLine2.getSelectedItem().toString())))
+					else
+						tfschLine2.setText(tfschLine2.getText()+","+cbschLine2.getSelectedItem().toString());
+//					else
+//						JOptionPane.showMessageDialog(null, cbschLine2.getSelectedItem().toString()+" already exist");
+				}
+			});
+			panel.add(schLine2Add,"sg line1btn,width 30:80:,span,split 2");
+			JButton schLine2Del = new JButton("Clear");
+			schLine2Del.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					tfschLine2.setText("");
+				}
+			});
+			panel.add(schLine2Del,"sg line1btn,width 30:80:,gapleft 15");
+			
+			//ROW #3
+			JLabel schlbl3 = new JLabel("Level: ");
+			panel.add(schlbl3,"sg line1");
+			
+			cbschlevel = new JComboBox<String>();
+			panel.add(cbschlevel,"growx,wrap");
+			
+			JLabel schlbl4 = new JLabel("Selected Level(s): ");
+			panel.add(schlbl4,"sg line1");
+			
+			tfschlevel = new JTextField();
+			tfschlevel.setEditable(false);
+			panel.add(tfschlevel,"growx,width 80:150:,wrap");
+			
+			//ROW #4
+			JButton schlevelAdd = new JButton("Add");
+			schlevelAdd.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if(tfschlevel.getText().isEmpty())
+						tfschlevel.setText(cbschlevel.getSelectedItem().toString());
+//					else if(!tfschlevel.getText().contains((cbschlevel.getSelectedItem().toString())))
+					else
+						tfschlevel.setText(tfschlevel.getText()+","+cbschlevel.getSelectedItem().toString());
+//					else
+//						JOptionPane.showMessageDialog(null, cbschlevel.getSelectedItem().toString()+" already exist");
+				}
+			});
+			panel.add(schlevelAdd,"sg line1btn,width 30:80:,span,split 2");
+			JButton schlevelDel = new JButton("Clear");
+			schlevelDel.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					tfschlevel.setText("");
+				}
+			});
+			panel.add(schlevelDel,"sg line1btn,width 30:80:,gapleft 15");
+		}
 	}
 }

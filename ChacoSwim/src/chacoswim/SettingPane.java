@@ -1,6 +1,7 @@
 package chacoswim;
 
 import java.awt.Dimension;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -8,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.*;
 
@@ -22,10 +24,12 @@ public class SettingPane implements ActionListener{
 	private JButton locationsAdd;
 	private JButton locationsDelete;
 	private JButton locationsUpdate;
-	public SettingPane() {
+	private ChacoSwim cs;
+	public SettingPane(ChacoSwim cs) {
 		super();
-		// TODO Auto-generated constructor stub
+		this.cs = cs;
 	}
+	
 	/**
 	 * Get a JPanel with titled border
 	 * @param title
@@ -69,7 +73,7 @@ public class SettingPane implements ActionListener{
 		try{
 			Connection conn=sqliteConnection.dbConnector();
 			PreparedStatement pst=null;
-			String name,type,id,add,pho,query;
+			String name,type,id,add,pho,lines,query;
 			switch(key){
 			case "termsAdd":
 				name = para[0];
@@ -102,24 +106,28 @@ public class SettingPane implements ActionListener{
 				name = para[0];
 				add = para[1];
 				pho = para[2];
-				query = "INSERT INTO location (name,address,phone) VALUES (?,?,?)";
+				lines = para[3];
+				query = "INSERT INTO location (name,address,phone,lines) VALUES (?,?,?,?)";
 				pst = conn.prepareStatement(query);
 				pst.setString(1, name);
 				pst.setString(2, add);
 				pst.setString(3, pho);
+				pst.setString(4, lines);
 				pst.execute();
 				break;
 			case "locationUpdate":
 				name = para[0];
 				add = para[1];
 				pho = para[2];
-				id = para[3];
-				query = "UPDATE location SET name = ?, address = ?, phone = ? WHERE id = ?";
+				lines = para[3];
+				id = para[4];
+				query = "UPDATE location SET name = ?, address = ?, phone = ?, lines = ? WHERE id = ?";
 				pst = conn.prepareStatement(query);
 				pst.setString(1, name);
 				pst.setString(2, add);
 				pst.setString(3, pho);
-				pst.setString(4, id);
+				pst.setString(4, lines);
+				pst.setString(5, id);
 				pst.execute();
 				break;
 			case "locationDelete":
@@ -134,7 +142,12 @@ public class SettingPane implements ActionListener{
 			}//switch
 			pst.close();
 			conn.close();
-		}catch(Exception e){
+			JOptionPane.showMessageDialog(null, "Done");
+			cs.initialValues();
+		}catch(SQLException sqle){
+			JOptionPane.showMessageDialog(null, "Record may already exist");
+		}
+		catch(Exception e){
 			JOptionPane.showMessageDialog(null, e);
 		}
 	}
@@ -189,10 +202,11 @@ public class SettingPane implements ActionListener{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				manage("termsAdd",tfname.getText(),cbType.getSelectedItem().toString());
-				JOptionPane.showMessageDialog(null, "Done");
-				fillTable(table,"terms");
+				if(tfname.getText().isEmpty()) JOptionPane.showMessageDialog(name, "Term name is empty");
+				else{
+					manage("termsAdd",tfname.getText(),cbType.getSelectedItem().toString());
+					fillTable(table,"terms");
+				}
 			}
 		});
 		termsUpdate.addActionListener(new ActionListener(){
@@ -203,9 +217,11 @@ public class SettingPane implements ActionListener{
 				int row = table.getSelectedRow();
 				if(row!=-1){
 					String id = table.getValueAt(row, 0).toString();
-					manage("termsUpdate",tfname.getText(),cbType.getSelectedItem().toString(),id);
-					JOptionPane.showMessageDialog(null, "Done");
-					fillTable(table,"terms");
+					if(tfname.getText().isEmpty()) JOptionPane.showMessageDialog(name, "Term name is empty");
+					else{
+						manage("termsUpdate",tfname.getText(),cbType.getSelectedItem().toString(),id);
+						fillTable(table,"terms");
+					}
 				}
 				else JOptionPane.showMessageDialog(null, "Select a valid row from table first");
 			}
@@ -216,10 +232,12 @@ public class SettingPane implements ActionListener{
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				int row = table.getSelectedRow();
+				if(row!=-1){
 				String id = table.getValueAt(row, 0).toString();
 				manage("termsDelete",id);
-				JOptionPane.showMessageDialog(null, "Done");
 				fillTable(table,"terms");
+				}
+				else JOptionPane.showMessageDialog(null, "Select a valid row from table first");
 			}
 		});
 		
@@ -257,7 +275,11 @@ public class SettingPane implements ActionListener{
 		JLabel pho = new JLabel("Phone: ");
 		JTextField tfpho = new JTextField();
 		p.add(pho,"right,sg 2");
-		p.add(tfpho,"width 10:150:200,span, pushx, growx, wrap");
+		p.add(tfpho,"width 10:70:200,growx");
+		JLabel lines = new JLabel("Lines: ");
+		JTextField tflines = new JTextField();
+		p.add(lines,"right");
+		p.add(tflines,"width 10:70:,growx,wrap");
 		//buttons
 		locationsAdd = new JButton("Add");
 		locationsUpdate = new JButton("Update");
@@ -273,7 +295,8 @@ public class SettingPane implements ActionListener{
 				if(row!=-1){
 					tfname.setText(table.getValueAt(row, 1).toString());
 					tfadd.setText(table.getValueAt(row, 2).toString());
-					tfpho.setText(table.getValueAt(row, 2).toString());
+					tfpho.setText(table.getValueAt(row, 3).toString());
+					tflines.setText(table.getValueAt(row, 4).toString());
 				}
 			}
 		});
@@ -282,10 +305,17 @@ public class SettingPane implements ActionListener{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				manage("locationAdd",tfname.getText(),tfadd.getText(),tfpho.getText());
-				JOptionPane.showMessageDialog(null, "Done");
-				fillTable(table,"location");
+				try {
+					if(tfname.getText().isEmpty()||tflines.getText().isEmpty()) JOptionPane.showMessageDialog(null,"Please fill location name and total line numbers" );
+					else{
+						Integer.valueOf(tflines.getText());
+						manage("locationAdd",tfname.getText(),tfadd.getText(),tfpho.getText(),tflines.getText());
+						fillTable(table,"location");
+					}
+				} catch (NumberFormatException e1) {
+					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, "Invalid line number, please enter an integer value");
+				}
 			}
 		});
 		locationsUpdate.addActionListener(new ActionListener(){
@@ -296,9 +326,18 @@ public class SettingPane implements ActionListener{
 				int row = table.getSelectedRow();
 				if(row!=-1){
 					String id = table.getValueAt(row, 0).toString();
-					manage("locationUpdate",tfname.getText(),tfadd.getText(),tfpho.getText(),id);
-					JOptionPane.showMessageDialog(null, "Done");
-					fillTable(table,"location");
+					
+					try {
+						if(tfname.getText().isEmpty()||tflines.getText().isEmpty()) JOptionPane.showMessageDialog(null,"Please fill location name and total line numbers" );
+						else{
+							Integer.valueOf(tflines.getText());
+							manage("locationUpdate",tfname.getText(),tfadd.getText(),tfpho.getText(),tflines.getText(),id);
+							fillTable(table,"location");
+						}
+					} catch (NumberFormatException e1) {
+						// TODO Auto-generated catch block
+						JOptionPane.showMessageDialog(null, "Invalid line number, please enter an integer value");
+					}
 				}
 				else JOptionPane.showMessageDialog(null, "Select a valid row from table first");
 			}
@@ -312,7 +351,6 @@ public class SettingPane implements ActionListener{
 				if(row!=-1){
 					String id = table.getValueAt(row, 0).toString();
 					manage("locationDelete",id);
-					JOptionPane.showMessageDialog(null, "Done");
 					fillTable(table,"location");
 				}
 				else JOptionPane.showMessageDialog(null, "Select a valid row from table first");

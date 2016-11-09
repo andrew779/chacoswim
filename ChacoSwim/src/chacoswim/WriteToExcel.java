@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.sql.rowset.CachedRowSet;
 import javax.swing.JOptionPane;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -35,12 +36,15 @@ public class WriteToExcel {
 	private List<StudentObject> l1,l2,l3,l4,l5,l6;
 	private List<String> c1,c2,c3,c4,c5,c6;
 	private List<String> timeMark,lineMark;
+	private boolean type;
+	private static final String ROWSET_IMPL_CLASS = "com.sun.rowset.CachedRowSetImpl";
 	
-	public WriteToExcel(File file,String term,String location,String day){
+	public WriteToExcel(File file,String term,String location,String day,boolean type){
 		this.file=file;
 		this.day=day;
 		this.term=term;
 		this.location=location;
+		this.type = type;
 	}
 	
 	public CellStyle setHeadStyle(){
@@ -99,8 +103,9 @@ public class WriteToExcel {
 	}
 	
 	
-	public ResultSet getResult(){
+	public CachedRowSet getResult(){
 		ResultSet rs=null;
+		CachedRowSet crs=null;
 		try{
 			String query="";
 			if(day.equals("All")){
@@ -111,25 +116,31 @@ public class WriteToExcel {
 				//query = "select t.sid, s.FirstName, s.LastName, s.CurLevel, t.day, t.time, t.line, t.coach from '"+term+"' t JOIN students s on s.sid = t.sid WHERE t.day = '"+day+ 
 				//	"' ORDER BY t.day, t.time, t.line, s.CurLevel";
 				DataBaseManage dbm = new DataBaseManage();
+				String condition = " NOT LIKE 0";
+				if(type) condition = " LIKE 0";
 				String termID = dbm.gotId("terms", term);
 				String locationID = dbm.gotId("location", location);
 				query = "select a.sid, s.firstName, s.lastName, level.name as CurLevel, a.day, a.time, a.line, c.name as Coach from"
 						+" active_record a JOIN students s ON s.sid=a.sid"
 						+" JOIN level ON a.levelID = level.id"
 						+" JOIN coach c ON a.coachID = c.id"
-						+" WHERE a.day = '"+day+"' AND a.termID = '"+termID+"' AND a.locationID = '"+locationID+"'"
+						+" WHERE a.day = '"+day+"' AND a.termID = '"+termID+"' AND a.locationID = '"+locationID+"' AND a.sid"+condition+0
 						+" ORDER BY a.day, a.time, a.line, level.name";
 			}
+			Class<?> c = Class.forName(ROWSET_IMPL_CLASS);
+			crs = (CachedRowSet) c.newInstance();
 			PreparedStatement pst=conn.prepareStatement(query);
 			rs = pst.executeQuery();
-			
+			crs.populate(rs);
+			rs.close();
+			pst.close();
 			
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 		
 		
-		return rs;
+		return crs;
 	}
 	public void dealDataP2(List<StudentObject> l12,List<String> c12){
 		int a = timeMark.size();
@@ -146,20 +157,31 @@ public class WriteToExcel {
 				for(StudentObject i:l12){
 					if(i.getTime().equals(timeMark.get(count))){
 						//get level row
-						if(levelL1.isEmpty()) levelL1=i.getLevel().substring(i.getLevel().indexOf("_")+1)+"/";						
-						else if(!levelL1.isEmpty()&&!levelL1.contains(i.getLevel().substring(i.getLevel().indexOf("_")+1)))levelL1=levelL1+i.getLevel().substring(i.getLevel().indexOf("_")+1);
+						if(levelL1.isEmpty()) levelL1=i.getLevel().substring(i.getLevel().indexOf("_")+1);						
+						else if(!levelL1.isEmpty()&&!levelL1.contains(i.getLevel().substring(i.getLevel().indexOf("_")+1)))levelL1=levelL1+"/"+i.getLevel().substring(i.getLevel().indexOf("_")+1);
 						
 						//get coach row
 						if(coachL1.isEmpty())coachL1=i.getCoach();
 						else if(!coachL1.isEmpty()&&!coachL1.contains(i.getCoach()))coachL1=coachL1+"/"+i.getCoach();
 						
-						//add students						
-						if(i.getLevel().substring(i.getLevel().indexOf("_")+1).equals(levelL1.substring(0, levelL1.indexOf("/")))){
-							leftList.add(i.getName()+"("+i.getLevel().substring(i.getLevel().length()-1)+")");
-							
+						//add students
+						if(levelL1.contains("/")){
+							if(i.getLevel().substring(i.getLevel().indexOf("_")+1).equals(levelL1.substring(0, levelL1.indexOf("/")))){
+								leftList.add(i.getName()+"("+i.getLevel().substring(i.getLevel().length()-1)+")");
+								
+							}
+							else{
+								rightList.add(i.getName()+"("+i.getLevel().substring(i.getLevel().length()-1)+")");							
+							}
 						}
 						else{
-							rightList.add(i.getName()+"("+i.getLevel().substring(i.getLevel().length()-1)+")");							
+							if(i.getLevel().substring(i.getLevel().indexOf("_")+1).equals(levelL1)){
+								leftList.add(i.getName()+"("+i.getLevel().substring(i.getLevel().length()-1)+")");
+								
+							}
+							else{
+								rightList.add(i.getName()+"("+i.getLevel().substring(i.getLevel().length()-1)+")");							
+							}
 						}
 					}
 				}
@@ -325,7 +347,7 @@ public class WriteToExcel {
 			}
 			*/
 			
-			ResultSet rs=getResult();
+			CachedRowSet rs=getResult();
 			
 			//data 
 			//create student object categorized by line no.
@@ -372,7 +394,7 @@ public class WriteToExcel {
 					}
 					
 				}//while rs
-			
+				
 				
 				//get all the columns of data
 				dealData();

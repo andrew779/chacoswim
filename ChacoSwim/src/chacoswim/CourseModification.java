@@ -199,8 +199,12 @@ public class CourseModification extends JFrame {
 					String timeEnd = time.substring(6);
 					String line = rs.getString("line").toString();
 					String coach = rs.getString("coach").toString();
-					String pay = rs.getString("payment_method").toString();
-					String amount = rs.getString("amount").toString();
+					String pay = "",amount="";
+					if(rs.getString("payment_method")!=null&&rs.getString("amount")!=null){
+						pay = rs.getString("payment_method").toString();
+						amount = rs.getString("amount").toString();
+					}
+					
 					
 					tfSID.setText(rs.getString("sid"));
 					textFieldFirstName.setText(rs.getString("firstname"));
@@ -232,7 +236,8 @@ public class CourseModification extends JFrame {
 				pst.close();
 			}
 		}catch (Exception e) {
-			JOptionPane.showMessageDialog(null, e);
+			//JOptionPane.showMessageDialog(null, e);
+			e.printStackTrace();
 		}
 	}
 	

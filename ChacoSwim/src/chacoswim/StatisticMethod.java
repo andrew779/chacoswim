@@ -26,7 +26,7 @@ public class StatisticMethod {
 	public String getTotal(){
 		String total="";
 		try{
-			String query="select count(*) from students";
+			String query="select count(*) from students where sid != 0";
 			PreparedStatement pst=conn.prepareStatement(query);
 			ResultSet rs=pst.executeQuery();
 			
@@ -48,7 +48,7 @@ public class StatisticMethod {
 	public String getDays(String day){
 		String str="";
 		try{
-			String query="select count(*) from '"+term+"' WHERE day='"+day+"'";
+			String query="select count(*) from active_record WHERE day='"+day+"' AND sid != 0";
 			PreparedStatement pst=conn.prepareStatement(query);
 			ResultSet rs=pst.executeQuery();
 			
@@ -96,7 +96,7 @@ public class StatisticMethod {
 		
 		try {
 			List<String> list = new ArrayList<String>();
-			String query="select name from sqlite_master where type='table' and name!='admin' and name!='duration' and name!='day_of_week' and name!='sqlite_sequence' and name!='coach' and name!='students' and name!='level';";
+			String query="select name from terms";
 			PreparedStatement pst=conn.prepareStatement(query);
 			ResultSet rs=pst.executeQuery();
 			while(rs.next()){
@@ -116,16 +116,18 @@ public class StatisticMethod {
 	public String[] getCoaches_Term(String name){
 		ArrayList<String> list = new ArrayList<String>();
 		String[] terms = getTerms();
-		//String[] coaches = getCoaches();
+		
 		try{
 			for(String i:terms){
-				String query = "select count(*) from '"+i+"' WHERE coach='"+name+"';";
+				
+				String query = "select count(*) from active_record a JOIN coach c ON c.id = a.coachID "
+						+ "JOIN terms t ON t.id = a.termID WHERE a.sid != 0 AND c.name='"+name+"' AND t.name = '"+i+"'";
 				PreparedStatement pst=conn.prepareStatement(query);
 				ResultSet rs=pst.executeQuery();
 				while(rs.next())list.add(i+" : "+rs.getString(1));			
 			}
 			String[] str=new String[list.size()];
-			list.toArray(str);
+			str = list.toArray(str);
 			return str;
 		}catch(Exception e){
 			JOptionPane.showMessageDialog(null, e);
@@ -139,7 +141,9 @@ public class StatisticMethod {
 		try{
 			String query="";
 			if(day.equals("All")){
-				query = "select t.SID, s.FirstName, s.LastName, s.CurLevel, t.Time, t.Coach from '"+term+"' t JOIN students s on s.sid = t.sid ORDER BY t.day, t.time, t.line, s.CurLevel";
+				query = "select a.SID, s.FirstName, s.LastName, level.name as CurLevel, a.Time, c.name as Coach from 'active_record' a"
+						+ " JOIN students s on s.sid = t.sid"
+						+ " JOIN coach c on c.id = s.coachID ORDER BY t.day, t.time, t.line, a.CurLevel";
 			}
 			else{
 				query = "select t.sid, s.FirstName, s.LastName, s.CurLevel, t.time, t.coach from '"+term+"' t JOIN students s on s.sid = t.sid WHERE t.day = '"+day+ 
@@ -159,12 +163,21 @@ public class StatisticMethod {
 		ResultSet rs=null;
 		try{
 			String query="";
-			query = "select t.sid, s.FirstName, s.LastName, s.CurLevel,s.PreLevel, t.time,t.coach from '"+term+"' t JOIN students s on s.sid = t.sid WHERE t.coach = '"+coach+ 
-					"' ORDER BY t.day, t.time, t.line, s.CurLevel";
+			query = "select a.sid, l.name as Location, s.FirstName, s.LastName, level.name as CurLevel, a.time,c.name as Coach from 'active_record' a"
+					+ " JOIN students s on s.sid = a.sid"
+					+ " JOIN terms t on t.id = a.termID"
+					+ " JOIN coach c on c.id = a.coachID"
+					+ " JOIN level on level.id = a.levelID"
+					+ " JOIN location l on l.id = a.locationID"
+					+ " WHERE a.sid != 0 and c.name = '"+coach+ 
+					"' AND t.name = '"+term
+					+ "' ORDER BY a.sid, a.day, a.time";
 				
 			PreparedStatement pst=conn.prepareStatement(query);
 			rs = pst.executeQuery();
 			table.setModel(DbUtils.resultSetToTableModel(rs));
+			table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+			table.setAutoCreateRowSorter(true);
 			rs.close();
 			pst.close();
 		}catch(Exception e){

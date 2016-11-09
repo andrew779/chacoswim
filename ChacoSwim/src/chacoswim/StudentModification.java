@@ -375,10 +375,12 @@ public String[] getLevel(){
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(317, 65, 310, 405);
+		scrollPane.setFocusable(false);
 		contentPane.add(scrollPane);
 		
 		textArea = new JTextArea();
 		textArea.setEditable(false);
+		textArea.setFocusable(false);
 		scrollPane.setViewportView(textArea);
 		
 		JButton btnCancel = new JButton("Cancel");
