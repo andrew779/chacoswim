@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="model.ChacoSwimModel"/>
+<fullyQualifiedTypeName name="chacoswim.ChacoSwimMethods"/>
+<fullyQualifiedTypeName name="java.sql.Connection"/>
+<fullyQualifiedTypeName name="java.sql.ResultSet"/>
+<fullyQualifiedTypeName name="javax.swing.JTable"/>
+<fullyQualifiedTypeName name="java.util.ArrayList"/>
+<fullyQualifiedTypeName name="javax.sql.rowset.CachedRowSet"/>
+<fullyQualifiedTypeName name="chacoswim.DataBaseManage"/>
+<fullyQualifiedTypeName name="chacoswim.RetakeObject"/>
+<fullyQualifiedTypeName name="org.apache.commons.logging.Log"/>
+<fullyQualifiedTypeName name="java.io.Console"/>
+<fullyQualifiedTypeName name="javax.swing.JOptionPane"/>
+<fullyQualifiedTypeName name="java.sql.SQLException"/>
+<fullyQualifiedTypeName name="java.awt.event.FocusListener"/>
+</qualifiedTypeNameHistroy>
