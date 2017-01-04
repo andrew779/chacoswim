@@ -1662,7 +1662,13 @@ public class ChacoSwim extends JFrame {
 				
 				
 		
-//END Scedule Panel-------------------		
+//END Scedule Panel-------------------
+
+
+//Start waiting list---------------------
+
+
+//END waiting list ----------------------
 		
 //Start Tab Coach~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		CoachTab = new JPanel();
