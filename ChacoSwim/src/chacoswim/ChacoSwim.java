@@ -861,13 +861,13 @@ public class ChacoSwim extends JFrame {
 		if(tglbtnSchedule.isSelected()){
 			csp.refreshTable("overbuttom2");
 			csp.refreshTable("jtTimeCount0");
-			csp.refreshTable("jtLineCount0");
+//			csp.refreshTable("jtLineCount0");
 			
 		}
 		else {
 			csp.refreshTable("overbuttom");
 			csp.refreshTable("jtTimeCount");
-			csp.refreshTable("jtLineCount");
+//			csp.refreshTable("jtLineCount");
 		}
 	}
 	
@@ -1330,18 +1330,18 @@ public class ChacoSwim extends JFrame {
 		//panel.add(btnReload);
 		
 		JScrollPane scrollPane_3 = new JScrollPane();
-		scrollPane_3.setBounds(826, 276, 377, 128);
+		scrollPane_3.setBounds(826, 276, 377, 296);
 		panel.add(scrollPane_3);
 		
 		jtTimeCount = new JTable();
 		scrollPane_3.setViewportView(jtTimeCount);
 		
-		JScrollPane scrollPane_11 = new JScrollPane();
-		scrollPane_11.setBounds(825, 444, 378, 128);
-		panel.add(scrollPane_11);
-		
-		jtLineCount = new JTable();
-		scrollPane_11.setViewportView(jtLineCount);
+//		JScrollPane scrollPane_11 = new JScrollPane();
+//		scrollPane_11.setBounds(825, 444, 378, 128);
+//		panel.add(scrollPane_11);
+//		
+//		jtLineCount = new JTable();
+//		scrollPane_11.setViewportView(jtLineCount);
 
 //Start Students Tab-----------------------TODO StudentTab
 		JPanel StudentsTab = new JPanel();

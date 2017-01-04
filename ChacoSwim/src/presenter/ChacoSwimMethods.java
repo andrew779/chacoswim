@@ -138,21 +138,54 @@ public class ChacoSwimMethods {
 			case "jtTimeCount":
 			case "jtTimeCount0":
 				
-				if (day.equalsIgnoreCase("all"))
-					day = "%";
+//				if (day.equalsIgnoreCase("all"))
+//					day = "%";
 				
-				if(key.equalsIgnoreCase("jtTimeCount"))
-					query = "select a.time,count(a.time) as count from active_record a"
-							+ " INNER JOIN terms t ON t.id = a.termID"
-							+ " INNER JOIN location l ON l.id = a.locationID" 
-							+ " where a.sid != 0 AND t.name = '" + term + "' AND l.name = '"
-							+ location + "' AND a.day LIKE '" + day + "' group by a.time ORDER BY a.time";
-				else
-					query = "select a.time,count(a.time) as count from active_record a"
-							+ " INNER JOIN terms t ON t.id = a.termID"
-							+ " INNER JOIN location l ON l.id = a.locationID" 
-							+ " where a.sid = 0 AND t.name = '" + term + "' AND l.name = '"
-							+ location + "' AND a.day LIKE '" + day + "' group by a. time ORDER BY a.time";
+				if(key.equalsIgnoreCase("jtTimeCount")){
+					if(day.equalsIgnoreCase("all")){
+						query = "SELECT a.day,a.time, level.name as level,count(*)"
+								+ " from active_record a"
+								+ " INNER JOIN terms t ON t.id = a.termID"
+								+ " INNER JOIN location l ON l.id = a.locationID"
+								+ " INNER JOIN level ON level.id = a.levelID"
+								+ " WHERE a.sid != 0 AND t.name = '" + term + "' AND l.name = '"+ location 
+								+ "' group by level.name, a.day, a.time"
+								+ " ORDER BY a.day,a.time,level.name";
+					}
+					else{
+						query = "select a.day,a.time, level.name as level,count(*) from active_record a"
+								+ " INNER JOIN terms t ON t.id = a.termID"
+								+ " INNER JOIN location l ON l.id = a.locationID"
+								+ " INNER JOIN level ON level.id = a.levelID"
+								+ " where a.sid != 0 AND t.name = '" + term + "' AND l.name = '"
+								+ location + "' AND a.day LIKE '" + day + "' group by level.name, a.day, a.time"
+								+ " ORDER BY a.day,a.time,level.name";
+					}
+					
+				}
+					
+				else{
+					if(day.equalsIgnoreCase("all")){
+						query = "SELECT a.day,a.time, level.name as level,count(*)"
+								+ " from active_record a"
+								+ " INNER JOIN terms t ON t.id = a.termID"
+								+ " INNER JOIN location l ON l.id = a.locationID"
+								+ " INNER JOIN level ON level.id = a.levelID"
+								+ " WHERE a.sid = 0 AND t.name = '" + term + "' AND l.name = '"+ location 
+								+ "' group by level.name, a.day, a.time"
+								+ " ORDER BY a.day,a.time,level.name";
+					}
+					else{
+						query = "select a.day,a.time, level.name as level,count(*) from active_record a"
+								+ " INNER JOIN terms t ON t.id = a.termID"
+								+ " INNER JOIN location l ON l.id = a.locationID"
+								+ " INNER JOIN level ON level.id = a.levelID"
+								+ " where a.sid = 0 AND t.name = '" + term + "' AND l.name = '"
+								+ location + "' AND a.day LIKE '" + day + "' group by level.name, a.day, a.time"
+								+ " ORDER BY a.day,a.time,level.name";
+					}
+				}
+					
 				break;
 				
 			case "jtLineCount":
