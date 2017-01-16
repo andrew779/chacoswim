@@ -23,35 +23,39 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="ChacoSwim.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="ChacoSwim.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/chacoswim/ChacoSwim.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="13800">
-              <caret line="1000" column="36" selection-start-line="1000" selection-start-column="36" selection-end-line="1000" selection-end-column="36" />
+            <state relative-caret-position="323">
+              <caret line="387" column="41" selection-start-line="387" selection-start-column="41" selection-end-line="387" selection-end-column="41" />
               <folding>
-                <element signature="docComment;field#serialVersionUID#0;class#ChacoSwim#0" expanded="false" />
-                <marker date="1477265637000" expanded="true" signature="6417:6434" placeholder="Select name missingValue" />
-                <marker date="1477265637000" expanded="true" signature="6721:6738" placeholder="Select name missingValue" />
-                <marker date="1477265637000" expanded="true" signature="7425:7462" placeholder="select * fro... students" />
-                <marker date="1477265637000" expanded="true" signature="7482:7517" placeholder="select * fro... students" />
-                <marker date="1477265637000" expanded="true" signature="8284:8734" placeholder="select a.id,... active_record" />
+                <marker date="1483805615000" expanded="true" signature="8593:8634" placeholder="Select name missingValue" />
+                <marker date="1483805615000" expanded="true" signature="8915:8956" placeholder="Select name missingValue" />
+                <marker date="1483805615000" expanded="true" signature="9640:9677" placeholder="select * fro... students" />
+                <marker date="1483805615000" expanded="true" signature="9697:9732" placeholder="select * fro... students" />
+                <marker date="1483805615000" expanded="true" signature="10499:10993" placeholder="select a.id,... active_record" />
+                <marker date="1483805615000" expanded="true" signature="12167:12249" placeholder="UPDATE activ... " />
+                <marker date="1483805615000" expanded="true" signature="13116:13538" placeholder="select a.sid... active_record" />
+                <marker date="1483805615000" expanded="true" signature="13575:13996" placeholder="select a.sid... active_record" />
+                <marker date="1483805615000" expanded="true" signature="15100:15542" placeholder="select a.id,... " />
+                <marker date="1483805615000" expanded="true" signature="15577:16034" placeholder="select a.id,... " />
+                <marker date="1483805615000" expanded="true" signature="24037:24140" placeholder="select * fro... students" />
+                <marker date="1483805615000" expanded="true" signature="24881:24915" placeholder="delete from " />
+                <marker date="1483805615000" expanded="true" signature="25361:25404" placeholder="select sid,f... students" />
+                <marker date="1483805615000" expanded="true" signature="26375:26398" placeholder="select email... coach" />
+                <marker date="1483805615000" expanded="true" signature="26934:27109" placeholder="select s.ema... " />
+                <marker date="1483805615000" expanded="true" signature="27128:27323" placeholder="select s.ema... " />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CourseModification.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="CourseModification.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/chacoswim/CourseModification.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="152">
+            <state relative-caret-position="1980">
               <caret line="160" column="26" selection-start-line="160" selection-start-column="26" selection-end-line="160" selection-end-column="26" />
-              <folding>
-                <marker date="1476641577000" expanded="true" signature="2639:2661" placeholder="select name coach" />
-                <marker date="1476641577000" expanded="true" signature="3098:3140" placeholder="select * fro... " />
-                <marker date="1476641577000" expanded="true" signature="4358:4528" placeholder="INSERT INTO " />
-                <marker date="1476641577000" expanded="true" signature="5629:5664" placeholder="select * fro... students" />
-                <marker date="1476641577000" expanded="true" signature="6009:6237" placeholder="select a.id,... active_record" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -66,6 +70,7 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+        <option value="$PROJECT_DIR$/src/chacoswim/CourseModification.java" />
         <option value="$PROJECT_DIR$/src/chacoswim/ChacoSwim.java" />
       </list>
     </option>
@@ -76,8 +81,8 @@
     <detection-done>true</detection-done>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="9" />
-    <option name="y" value="29" />
+    <option name="x" value="33" />
+    <option name="y" value="23" />
     <option name="width" value="1400" />
     <option name="height" value="833" />
   </component>
@@ -159,13 +164,14 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
       <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="aspect.path.notification.shown" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="js-jscs-nodeInterpreter" value="/usr/local/bin/node" />
   </component>
   <component name="RunManager" selected="Application.Login">
     <configuration default="false" name="Login" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
@@ -613,14 +619,16 @@
       <updated>1477246597880</updated>
       <workItem from="1477246611555" duration="749000" />
       <workItem from="1477273621203" duration="170000" />
+      <workItem from="1483804981566" duration="198000" />
+      <workItem from="1483805642161" duration="351000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="919000" />
+    <option name="totallyTimeSpent" value="1468000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="9" y="29" width="1400" height="833" extended-state="0" />
+    <frame x="33" y="23" width="1400" height="833" extended-state="0" />
     <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -633,7 +641,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2496318" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2496318" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -677,15 +685,58 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/chacoswim/ChacoSwim.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="13365">
-          <caret line="973" column="75" selection-start-line="973" selection-start-column="75" selection-end-line="973" selection-end-column="75" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="docComment;field#serialVersionUID#0;class#ChacoSwim#0" expanded="false" />
-            <marker date="1477265637000" expanded="true" signature="6417:6434" placeholder="Select name missingValue" />
-            <marker date="1477265637000" expanded="true" signature="6721:6738" placeholder="Select name missingValue" />
-            <marker date="1477265637000" expanded="true" signature="7425:7462" placeholder="select * fro... students" />
-            <marker date="1477265637000" expanded="true" signature="7482:7517" placeholder="select * fro... students" />
-            <marker date="1477265637000" expanded="true" signature="8284:8734" placeholder="select a.id,... active_record" />
+            <marker date="1483805615000" expanded="true" signature="8593:8634" placeholder="Select name missingValue" />
+            <marker date="1483805615000" expanded="true" signature="8915:8956" placeholder="Select name missingValue" />
+            <marker date="1483805615000" expanded="true" signature="9640:9677" placeholder="select * fro... students" />
+            <marker date="1483805615000" expanded="true" signature="9697:9732" placeholder="select * fro... students" />
+            <marker date="1483805615000" expanded="true" signature="10499:10993" placeholder="select a.id,... active_record" />
+            <marker date="1483805615000" expanded="true" signature="12167:12249" placeholder="UPDATE activ... " />
+            <marker date="1483805615000" expanded="true" signature="13116:13538" placeholder="select a.sid... active_record" />
+            <marker date="1483805615000" expanded="true" signature="13575:13996" placeholder="select a.sid... active_record" />
+            <marker date="1483805615000" expanded="true" signature="15100:15542" placeholder="select a.id,... " />
+            <marker date="1483805615000" expanded="true" signature="15577:16034" placeholder="select a.id,... " />
+            <marker date="1483805615000" expanded="true" signature="24037:24140" placeholder="select * fro... students" />
+            <marker date="1483805615000" expanded="true" signature="24881:24915" placeholder="delete from " />
+            <marker date="1483805615000" expanded="true" signature="25361:25404" placeholder="select sid,f... students" />
+            <marker date="1483805615000" expanded="true" signature="26375:26398" placeholder="select email... coach" />
+            <marker date="1483805615000" expanded="true" signature="26934:27109" placeholder="select s.ema... " />
+            <marker date="1483805615000" expanded="true" signature="27128:27323" placeholder="select s.ema... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/chacoswim/CourseModification.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1980">
+          <caret line="160" column="26" selection-start-line="160" selection-start-column="26" selection-end-line="160" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/chacoswim/ChacoSwim.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="13320">
+          <caret line="1000" column="36" selection-start-line="1000" selection-start-column="36" selection-end-line="1000" selection-end-column="36" />
+          <folding>
+            <marker date="1483805615000" expanded="true" signature="8593:8634" placeholder="Select name missingValue" />
+            <marker date="1483805615000" expanded="true" signature="8915:8956" placeholder="Select name missingValue" />
+            <marker date="1483805615000" expanded="true" signature="9640:9677" placeholder="select * fro... students" />
+            <marker date="1483805615000" expanded="true" signature="9697:9732" placeholder="select * fro... students" />
+            <marker date="1483805615000" expanded="true" signature="10499:10993" placeholder="select a.id,... active_record" />
+            <marker date="1483805615000" expanded="true" signature="12167:12249" placeholder="UPDATE activ... " />
+            <marker date="1483805615000" expanded="true" signature="13116:13538" placeholder="select a.sid... active_record" />
+            <marker date="1483805615000" expanded="true" signature="13575:13996" placeholder="select a.sid... active_record" />
+            <marker date="1483805615000" expanded="true" signature="15100:15542" placeholder="select a.id,... " />
+            <marker date="1483805615000" expanded="true" signature="15577:16034" placeholder="select a.id,... " />
+            <marker date="1483805615000" expanded="true" signature="24037:24140" placeholder="select * fro... students" />
+            <marker date="1483805615000" expanded="true" signature="24881:24915" placeholder="delete from " />
+            <marker date="1483805615000" expanded="true" signature="25361:25404" placeholder="select sid,f... students" />
+            <marker date="1483805615000" expanded="true" signature="26375:26398" placeholder="select email... coach" />
+            <marker date="1483805615000" expanded="true" signature="26934:27109" placeholder="select s.ema... " />
+            <marker date="1483805615000" expanded="true" signature="27128:27323" placeholder="select s.ema... " />
           </folding>
         </state>
       </provider>
@@ -694,13 +745,40 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/chacoswim/ChacoSwim.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="13365">
+          <caret line="973" column="75" selection-start-line="973" selection-start-column="75" selection-end-line="973" selection-end-column="75" />
           <folding>
-            <marker date="1476641577000" expanded="true" signature="2639:2661" placeholder="select name coach" />
-            <marker date="1476641577000" expanded="true" signature="3098:3140" placeholder="select * fro... " />
-            <marker date="1476641577000" expanded="true" signature="4358:4528" placeholder="INSERT INTO " />
-            <marker date="1476641577000" expanded="true" signature="5629:5664" placeholder="select * fro... students" />
-            <marker date="1476641577000" expanded="true" signature="6009:6237" placeholder="select a.id,... active_record" />
+            <marker date="1483805615000" expanded="true" signature="8593:8634" placeholder="Select name missingValue" />
+            <marker date="1483805615000" expanded="true" signature="8915:8956" placeholder="Select name missingValue" />
+            <marker date="1483805615000" expanded="true" signature="9640:9677" placeholder="select * fro... students" />
+            <marker date="1483805615000" expanded="true" signature="9697:9732" placeholder="select * fro... students" />
+            <marker date="1483805615000" expanded="true" signature="10499:10993" placeholder="select a.id,... active_record" />
+            <marker date="1483805615000" expanded="true" signature="12167:12249" placeholder="UPDATE activ... " />
+            <marker date="1483805615000" expanded="true" signature="13116:13538" placeholder="select a.sid... active_record" />
+            <marker date="1483805615000" expanded="true" signature="13575:13996" placeholder="select a.sid... active_record" />
+            <marker date="1483805615000" expanded="true" signature="15100:15542" placeholder="select a.id,... " />
+            <marker date="1483805615000" expanded="true" signature="15577:16034" placeholder="select a.id,... " />
+            <marker date="1483805615000" expanded="true" signature="24037:24140" placeholder="select * fro... students" />
+            <marker date="1483805615000" expanded="true" signature="24881:24915" placeholder="delete from " />
+            <marker date="1483805615000" expanded="true" signature="25361:25404" placeholder="select sid,f... students" />
+            <marker date="1483805615000" expanded="true" signature="26375:26398" placeholder="select email... coach" />
+            <marker date="1483805615000" expanded="true" signature="26934:27109" placeholder="select s.ema... " />
+            <marker date="1483805615000" expanded="true" signature="27128:27323" placeholder="select s.ema... " />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/chacoswim/CourseModification.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -711,31 +789,35 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/chacoswim/ChacoSwim.java">
+    <entry file="file://$PROJECT_DIR$/src/chacoswim/CourseModification.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="13800">
-          <caret line="1000" column="36" selection-start-line="1000" selection-start-column="36" selection-end-line="1000" selection-end-column="36" />
-          <folding>
-            <element signature="docComment;field#serialVersionUID#0;class#ChacoSwim#0" expanded="false" />
-            <marker date="1477265637000" expanded="true" signature="6417:6434" placeholder="Select name missingValue" />
-            <marker date="1477265637000" expanded="true" signature="6721:6738" placeholder="Select name missingValue" />
-            <marker date="1477265637000" expanded="true" signature="7425:7462" placeholder="select * fro... students" />
-            <marker date="1477265637000" expanded="true" signature="7482:7517" placeholder="select * fro... students" />
-            <marker date="1477265637000" expanded="true" signature="8284:8734" placeholder="select a.id,... active_record" />
-          </folding>
+        <state relative-caret-position="1980">
+          <caret line="160" column="26" selection-start-line="160" selection-start-column="26" selection-end-line="160" selection-end-column="26" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/chacoswim/CourseModification.java">
+    <entry file="file://$PROJECT_DIR$/src/chacoswim/ChacoSwim.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="152">
-          <caret line="160" column="26" selection-start-line="160" selection-start-column="26" selection-end-line="160" selection-end-column="26" />
+        <state relative-caret-position="323">
+          <caret line="387" column="41" selection-start-line="387" selection-start-column="41" selection-end-line="387" selection-end-column="41" />
           <folding>
-            <marker date="1476641577000" expanded="true" signature="2639:2661" placeholder="select name coach" />
-            <marker date="1476641577000" expanded="true" signature="3098:3140" placeholder="select * fro... " />
-            <marker date="1476641577000" expanded="true" signature="4358:4528" placeholder="INSERT INTO " />
-            <marker date="1476641577000" expanded="true" signature="5629:5664" placeholder="select * fro... students" />
-            <marker date="1476641577000" expanded="true" signature="6009:6237" placeholder="select a.id,... active_record" />
+            <marker date="1483805615000" expanded="true" signature="8593:8634" placeholder="Select name missingValue" />
+            <marker date="1483805615000" expanded="true" signature="8915:8956" placeholder="Select name missingValue" />
+            <marker date="1483805615000" expanded="true" signature="9640:9677" placeholder="select * fro... students" />
+            <marker date="1483805615000" expanded="true" signature="9697:9732" placeholder="select * fro... students" />
+            <marker date="1483805615000" expanded="true" signature="10499:10993" placeholder="select a.id,... active_record" />
+            <marker date="1483805615000" expanded="true" signature="12167:12249" placeholder="UPDATE activ... " />
+            <marker date="1483805615000" expanded="true" signature="13116:13538" placeholder="select a.sid... active_record" />
+            <marker date="1483805615000" expanded="true" signature="13575:13996" placeholder="select a.sid... active_record" />
+            <marker date="1483805615000" expanded="true" signature="15100:15542" placeholder="select a.id,... " />
+            <marker date="1483805615000" expanded="true" signature="15577:16034" placeholder="select a.id,... " />
+            <marker date="1483805615000" expanded="true" signature="24037:24140" placeholder="select * fro... students" />
+            <marker date="1483805615000" expanded="true" signature="24881:24915" placeholder="delete from " />
+            <marker date="1483805615000" expanded="true" signature="25361:25404" placeholder="select sid,f... students" />
+            <marker date="1483805615000" expanded="true" signature="26375:26398" placeholder="select email... coach" />
+            <marker date="1483805615000" expanded="true" signature="26934:27109" placeholder="select s.ema... " />
+            <marker date="1483805615000" expanded="true" signature="27128:27323" placeholder="select s.ema... " />
           </folding>
         </state>
       </provider>

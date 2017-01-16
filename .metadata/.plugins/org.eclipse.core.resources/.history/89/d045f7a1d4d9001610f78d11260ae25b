@@ -1,0 +1,67 @@
+package model;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+import javax.sql.rowset.CachedRowSet;
+
+public class WaitingListModel {
+
+	ChacoSwimModel csm;
+	public WaitingListModel(){
+		csm = new ChacoSwimModel();
+	}
+	public CachedRowSet getList(){
+		String query = "SELECT * FROM waiting_list";
+		CachedRowSet crs = csm.excuteWithRS(query);
+		return crs;
+	}
+	
+	public void updateList(){
+		ArrayList<WaitingListModel2> list = new ArrayList<WaitingListModel2>();
+		String query = "SELECT * FROM waiting_list";
+		CachedRowSet crs = csm.excuteWithRS(query);
+		try {
+			while(crs.next()){
+				String id = crs.getString("id");
+				String status = crs.getString("status");
+				String firstName = crs.getString("firstName");
+				String lastName = crs.getString("lastName");
+				String term = crs.getString("term");
+				String location = crs.getString("location");
+				String level = crs.getString("level");
+				String day = crs.getString("day");
+				String time = crs.getString("time");
+				WaitingListModel2 wlm2 = new WaitingListModel2(id,status,firstName,lastName,term,location,level,day,time);
+				list.add(wlm2);
+				checkStatus(wlm2);
+				System.out.println(wlm2.toString());
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private boolean checkStatus(WaitingListModel2 wlm2){
+		String query = "SELECT COUNT(*), a.id FROM active_record a"
+						+ " JOIN terms t ON t.id = a.termID"
+						+ " JOIN location l ON l.id = a.locationID"
+						+ " JOIN level ON level.id = a.levelID"
+						+ " WHERE t.name = '"+wlm2.getTerm()+"'"
+						+" AND l.name = '"+wlm2.getLocation()+"'"
+						+" AND level.name = '"+wlm2.getLevel()+"'"
+						+" AND a.day = '"+wlm2.getDay()+"'"
+						+" AND a.time = '"+wlm2.getTime()+"'"+" group by a.id";
+		CachedRowSet crs = csm.excuteWithRS(query);
+		try {
+			while(crs.next()){
+				System.out.println(crs.getString("count(*)")+" ID:"+crs.getString("id"));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+		
+	}
+}

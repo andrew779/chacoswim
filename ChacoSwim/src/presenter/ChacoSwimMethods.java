@@ -345,7 +345,7 @@ public class ChacoSwimMethods {
 		String time = cs.getCbSchStart().getSelectedItem().toString() + "-"
 				+ cs.getCbSchEnd().getSelectedItem().toString();
 		String coachID, levelID;
-		if (!c.isEmpty() || !l.isEmpty()) {
+		if (!c.isEmpty() && !l.isEmpty()) {
 			String[] coach = c.split(",");
 			String[] level = l.split(",");
 			if (coach.length == level.length) {
@@ -353,9 +353,9 @@ public class ChacoSwimMethods {
 					coachID = dbm.gotId("coach", coach[i]);
 					levelID = dbm.gotId("level", level[i]);
 
-					String query = "INSERT INTO active_record (sid,termID,locationID,day,coachID,levelID,line,time) VALUES (0,"
-							+ termID + "," + locationID + ",'" + day + "'," + coachID + "," + levelID + "," + line
-							+ ",'" + time + "')";
+					String query = "INSERT INTO active_record (sid,termID,locationID,day,coachID,levelID,line,time) VALUES (0,'"
+							+ termID + "','" + locationID + "','" + day + "','" + coachID + "','" + levelID + "','" + line
+							+ "','" + time + "')";
 					csm.executeWithoutRS(query);
 					
 				}
@@ -364,6 +364,12 @@ public class ChacoSwimMethods {
 			else
 				JOptionPane.showMessageDialog(cs, "In Line "+line+" Coach and Level are not pair up.");
 
+		}
+		else if (!c.isEmpty()&&l.isEmpty()){
+			JOptionPane.showMessageDialog(cs, "Coach: "+c+"\nLevel: missing\nFail to add this one record,Please add it separatly");
+		}
+		else if (c.isEmpty()&&!l.isEmpty()){
+			JOptionPane.showMessageDialog(cs, "Coach: missing\nLevel: "+l+"\nFail to add this one record,Please add it separatly");
 		}
 	}
 }

@@ -1,0 +1,16 @@
+package model;
+
+import javax.sql.rowset.CachedRowSet;
+
+public class WaitingListModel {
+
+	ChacoSwimModel csm;
+	public WaitingListModel(){
+		csm = new ChacoSwimModel();
+	}
+	public CachedRowSet getList(){
+		String query = "SELECT * FROM waiting_list";
+		CachedRowSet crs = csm.excuteWithRS(query);
+		return crs;
+	}
+}

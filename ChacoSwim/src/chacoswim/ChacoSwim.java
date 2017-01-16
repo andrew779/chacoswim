@@ -19,6 +19,7 @@ import javax.swing.border.EmptyBorder;
 
 import net.proteanit.sql.DbUtils;
 import presenter.ChacoSwimMethods;
+import view.WaitingListView;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -60,6 +61,8 @@ import javax.swing.table.TableModel;
 import javax.swing.text.JTextComponent;
 
 import model.ChacoSwimModel;
+import model.CommonModel;
+import model.WaitingListModel;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -117,18 +120,9 @@ public class ChacoSwim extends JFrame {
 	private final ButtonGroup buttonGroup_1 = new ButtonGroup();
 	private JButton btnAttachmentDelete;
 	private DefaultListModel<String> listModel;
-	private JComboBox<String> comboBoxStaTerm;
-	private JButton btnMonday;
-	private JButton btnTuesday;
-	private JButton btnWednesday;
-	private JButton btnThursday;
-	private JButton btnFriday;
-	private JButton btnSaturday;
-	private JButton btnSunday;
 	private JLabel lblTotalreg;
 	private JPanel StatisticsTab;
 	private JList<String> listCoach;
-	private JTable StaticTerm_Day;
 	private JTable StaticTerm_Coach;
 	private static ChacoSwim frame;
 	private JTable jtCoaches;
@@ -183,6 +177,9 @@ public class ChacoSwim extends JFrame {
 	private JPanel CoachTab;
 	private JTable jtTimeCount;
 	private JTable jtLineCount;
+	private JPanel WaitingListTab;
+	private WaitingListModel wlModel;
+	private WaitingListView wlView;
 	/**
 	 * TODO Launch the application.
 	 */
@@ -304,10 +301,10 @@ public class ChacoSwim extends JFrame {
 		return table;
 	}
 	
-	public void resizeColumnWidth(JTable table) {
+	public void resizeColumnWidth(JTable table,int size) {
 	    final TableColumnModel columnModel = table.getColumnModel();
-	    for (int column = 0; column < table.getColumnCount(); column++) {
-	        int width = 100; // Min width
+	    for (int column = 1; column < table.getColumnCount(); column++) {
+	        int width = size; // Min width
 	        for (int row = 0; row < table.getRowCount(); row++) {
 	            TableCellRenderer renderer = table.getCellRenderer(row, column);
 	            Component comp = table.prepareRenderer(renderer, row, column);
@@ -848,11 +845,15 @@ public class ChacoSwim extends JFrame {
 		listModel.addElement(i);
 		listAttachment.setModel(listModel);
 	}
+	
+	
 	/**
 	 * Create the frame.
 	 */
 	
 	public ChacoSwim() {
+		wlModel = new WaitingListModel();
+		wlView = new WaitingListView();
 		createView();
 		
 	}
@@ -871,8 +872,23 @@ public class ChacoSwim extends JFrame {
 		}
 	}
 	
+	//TODO waiting list methods
+	public void refreshWaitingListTable(){
+		wlModel.updateList();
+		wlView.listTable.setModel(DbUtils.resultSetToTableModel(wlModel.getList()));
+		TableColumnModel tcm = wlView.listTable.getColumnModel();
+		tcm.removeColumn(tcm.getColumn(0));
+		resizeColumnWidth(wlView.listTable,100);
+	}
+	public void deleteWaitingListRecord(int row){
+		String id = wlView.listTable.getModel().getValueAt(row, 0).toString();
+		String query = "DELETE FROM waiting_list where id = "+id;
+		new ChacoSwimModel().executeWithoutRS(query);
+	}
+	
 	
 	public void initialValues(){
+		
 		
 		cbSchTerm.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("terms", "cbSchTerm")));
 		cbSchLocation.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("location", "")));
@@ -886,7 +902,6 @@ public class ChacoSwim extends JFrame {
 		comboBoxTerm.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("terms", "")));
 		comboBoxStTerm.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("terms", "")));
 		comboBoxEmailTerm.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("terms", "")));
-		comboBoxStaTerm.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("terms", "")));
 		comboBoxExTerm.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("terms", "")));
 		//location
 		comboBoxLocation.setModel(new DefaultComboBoxModel<String>(csp.fillComboBox("location", "")));
@@ -1103,7 +1118,7 @@ public class ChacoSwim extends JFrame {
 		
 		
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		resizeColumnWidth(table);
+		resizeColumnWidth(table,100);
 		
 		
 		comboBoxTerm = new JComboBox<String>();
@@ -1662,8 +1677,239 @@ public class ChacoSwim extends JFrame {
 				
 				
 		
-//END Scedule Panel-------------------		
-		
+//END Schedule Panel-------------------		
+				
+//Waiting List Panel==============================
+				//TODO waiting list Tab
+				WaitingListTab = new JPanel();
+				tabbedPane.addTab("WaitingList",null,WaitingListTab,null);
+				WaitingListTab.setLayout(new MigLayout());
+//				WaitingListView wlView = new WaitingListView();
+				JPanel wlPanel = wlView.getView();
+				WaitingListTab.add(wlPanel);
+//				WaitingListModel wlModel = new WaitingListModel();
+				wlView.listTable.setModel(DbUtils.resultSetToTableModel(wlModel.getList()));
+				//hide first column of 'ID'
+				TableColumnModel tcm = wlView.listTable.getColumnModel();
+				tcm.removeColumn(tcm.getColumn(0));
+				resizeColumnWidth(wlView.listTable,100);
+				
+				wlView.cbTerm.setModel(new DefaultComboBoxModel<String>(CommonModel.fillComboBox("terms")));
+				wlView.cbLocation.setModel(new DefaultComboBoxModel<String>(CommonModel.fillComboBox("location")));
+				wlView.cbDay.setModel(new DefaultComboBoxModel<String>(CommonModel.fillComboBox("day")));
+				wlView.cbLevel.setModel(new DefaultComboBoxModel<String>(CommonModel.fillComboBox("level")));
+				wlView.cbStart.setModel(new DefaultComboBoxModel<String>(CommonModel.fillComboBox("time")));
+				wlView.cbEnd.setModel(new DefaultComboBoxModel<String>(CommonModel.fillComboBox("time")));
+				
+//				String mterm="",location="",day="",level="",start="",end="";
+				wlView.listTable.addMouseListener(new MouseAdapter(){
+					@Override
+					public void mouseClicked(MouseEvent arg0) {
+						int row = wlView.listTable.getSelectedRow();
+						if(row != -1){
+							wlView.tfFN.setText(wlView.listTable.getValueAt(row, 1).toString());
+							wlView.tfLN.setText(wlView.listTable.getValueAt(row, 2).toString());
+							if(wlView.listTable.getValueAt(row, 3) != null){
+								String term = wlView.listTable.getValueAt(row, 3).toString();
+								wlView.cbTerm.setSelectedItem(term);
+							}
+							if(wlView.listTable.getValueAt(row, 4) != null){
+								String location = wlView.listTable.getValueAt(row, 4).toString();
+								wlView.cbLocation.setSelectedItem(location);
+							}
+							if(wlView.listTable.getValueAt(row, 5) != null){
+								String level = wlView.listTable.getValueAt(row, 5).toString();
+								wlView.cbLevel.setSelectedItem(level);
+							}
+							if(wlView.listTable.getValueAt(row, 6) != null){
+								String day = wlView.listTable.getValueAt(row, 6).toString();
+								wlView.cbDay.setSelectedItem(day);
+							}
+							if(wlView.listTable.getValueAt(row, 7) != null){
+								String time = wlView.listTable.getValueAt(row, 7).toString();
+								String sTime = time.substring(0, time.indexOf("-"));
+								String eTime = time.substring(time.indexOf("-")+1);
+								wlView.cbStart.setSelectedItem(sTime);
+								wlView.cbEnd.setSelectedItem(eTime);
+							}
+						}
+					}
+				});
+
+				wlView.Add.addActionListener(new ActionListener(){
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						String fname = wlView.tfFN.getText();
+						String lname = wlView.tfLN.getText();
+						String term = wlView.cbTerm.getSelectedItem().toString();
+						String location = wlView.cbLocation.getSelectedItem().toString();
+						String level = wlView.cbLevel.getSelectedItem().toString();
+						String day = wlView.cbDay.getSelectedItem().toString();
+						String time = wlView.cbStart.getSelectedItem().toString()+"-"+wlView.cbEnd.getSelectedItem().toString();
+						String query = "INSERT INTO waiting_list (FirstName,LastName,Term,Location,Level,Day,Time) VALUES ('"+fname+"','"+lname+"','"+term+"','"+location+"','"
+								+level+"','"+day+"','"+time+"')";
+						if(fname.isEmpty()&&lname.isEmpty()){
+							JOptionPane.showMessageDialog(null, "Please enter a name first");
+						}
+						else{
+							new ChacoSwimModel().executeWithoutRS(query);
+							refreshWaitingListTable();
+							JOptionPane.showMessageDialog(null, "Added a new record");
+						}
+					}
+					
+				});
+				
+				wlView.Update.addActionListener(new ActionListener(){
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						int row = wlView.listTable.getSelectedRow();
+						if(row != -1){
+							String fname = wlView.tfFN.getText();
+							String lname = wlView.tfLN.getText();
+							String term = wlView.cbTerm.getSelectedItem().toString();
+							String location = wlView.cbLocation.getSelectedItem().toString();
+							String level = wlView.cbLevel.getSelectedItem().toString();
+							String day = wlView.cbDay.getSelectedItem().toString();
+							String time = wlView.cbStart.getSelectedItem().toString()+"-"+wlView.cbEnd.getSelectedItem().toString();
+							String query = "UPDATE waiting_list SET firstName = '"+fname+"',"
+									+ "lastName = '"+lname+"',"
+									+ "term = '"+term+"',"
+									+ "location = '"+location+"',"
+									+ "level = '"+level+"',"
+									+ "day = '"+day+"',"
+									+ "time = '"+time+"'"
+											+ " WHERE id = '"+wlView.listTable.getModel().getValueAt(row, 0)+"'";
+							if(fname.isEmpty()&&lname.isEmpty()){
+								JOptionPane.showMessageDialog(null, "Please enter a name first");
+							}
+							else{
+								new ChacoSwimModel().executeWithoutRS(query);
+								refreshWaitingListTable();
+								JOptionPane.showMessageDialog(null, "Updated");
+							}
+							
+						}
+						else{
+							JOptionPane.showMessageDialog(null, "Please select a row first");
+						}
+						
+					}
+					
+				});
+				
+				wlView.Reset.addActionListener(new ActionListener(){
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						wlView.tfFN.setText("");
+						wlView.tfLN.setText("");
+						wlView.cbTerm.setSelectedIndex(0);
+						wlView.cbLocation.setSelectedIndex(0);
+						wlView.cbLevel.setSelectedIndex(0);
+						wlView.cbDay.setSelectedIndex(0);
+						wlView.cbStart.setSelectedIndex(0);
+						wlView.cbEnd.setSelectedIndex(0);
+					}
+				});
+				
+				wlView.Remove.addActionListener(new ActionListener(){
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						int row = wlView.listTable.getSelectedRow();
+						if(row != -1){
+//							String id = wlView.listTable.getModel().getValueAt(row, 0).toString();
+//							String query = "DELETE FROM waiting_list where id = "+id;
+//							new ChacoSwimModel().executeWithoutRS(query);
+							deleteWaitingListRecord(row);
+							refreshWaitingListTable();
+							JOptionPane.showMessageDialog(null, "Deleted");
+						}
+						else{
+							JOptionPane.showMessageDialog(null, "Select a record first");
+						}
+					}
+				});
+				
+				wlView.Refresh.addActionListener(new ActionListener(){
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						refreshWaitingListTable();
+						JOptionPane.showMessageDialog(null, "Refreshed");
+					}
+					
+				});
+				
+				wlView.CheckIn.addActionListener(new ActionListener(){
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						int row = wlView.listTable.getSelectedRow();
+						if( row != -1){
+							String status = wlView.listTable.getValueAt(row, 0).toString();
+							if (status.equalsIgnoreCase("ok")){
+								int ans = JOptionPane.showConfirmDialog(null, "Is the selected user already a member?", "Confirmation", JOptionPane.YES_NO_CANCEL_OPTION);
+								if( ans == JOptionPane.YES_OPTION){
+									String fn = wlView.listTable.getValueAt(row, 1).toString();
+									String ln = wlView.listTable.getValueAt(row, 2).toString();
+									
+									String[] sidArray = wlModel.checkInClicked(fn, ln);
+									
+									//check if any record matches the fn,ln
+									if(sidArray != null){
+										JFrame frame = new JFrame("sid result");
+										String sid = (String) JOptionPane.showInputDialog(frame, "Found "+(sidArray.length)+" sid match(es) \n"+fn+" "+ln+"\nPlease"
+												+ " select the correct sid\n", "Select the right sid", JOptionPane.QUESTION_MESSAGE, null, sidArray, sidArray[0]);
+										if(sid != null){
+											if(!sid.isEmpty()){
+												wlModel.checkInWithSID(sid, wlView.listTable,row);
+												deleteWaitingListRecord(row);
+												refreshWaitingListTable();
+											}
+										}
+									}else{
+										int regNew = JOptionPane.showConfirmDialog(null, "Can't find any registration info that matches with the waiting list record,"
+												+ "\nDo you want to register a new record with basic info(if yes, please complete it later)?","Register a new record?",
+												JOptionPane.YES_NO_OPTION);
+										if( regNew == JOptionPane.YES_OPTION){
+											String tempSID = wlModel.registerNew(wlView.listTable, row);
+											wlModel.checkInWithSID(tempSID, wlView.listTable, row);
+											deleteWaitingListRecord(row);
+											refreshWaitingListTable();
+										}
+									}
+									//ask for sid next
+								}
+								
+								else if ( ans == JOptionPane.NO_OPTION){
+									int regNew = JOptionPane.showConfirmDialog(null,"Do you want to register a new record with basic info(if yes, please complete it later)?","Register a new record?",
+											JOptionPane.YES_NO_OPTION);
+									if( regNew == JOptionPane.YES_OPTION){
+										String tempSID = wlModel.registerNew(wlView.listTable, row);
+										wlModel.checkInWithSID(tempSID, wlView.listTable, row);
+										deleteWaitingListRecord(row);
+										refreshWaitingListTable();
+									}
+								}
+							}
+							else{
+								JOptionPane.showMessageDialog(null, "Current selection is not availble yet");
+							}
+						}
+						else{
+							JOptionPane.showMessageDialog(null, "Select a record first");
+						}
+						
+					}
+					
+				});
+//END Waiting List Panel ============================
+				
+				
 //Start Tab Coach~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		CoachTab = new JPanel();
 		tabbedPane.addTab("Coaches", null, CoachTab, null);
@@ -2151,102 +2397,9 @@ public class ChacoSwim extends JFrame {
 		lblTotalRegistedStudents.setBounds(49, 49, 215, 23);
 		StatisticsTab.add(lblTotalRegistedStudents);
 		
-		JSeparator separator_4 = new JSeparator();
-		separator_4.setBounds(10, 98, 1043, 2);
-		StatisticsTab.add(separator_4);
-		
-		JLabel lblStudentsNumberBased = new JLabel("Students number based on term: ");
-		lblStudentsNumberBased.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		lblStudentsNumberBased.setBounds(49, 131, 251, 23);
-		StatisticsTab.add(lblStudentsNumberBased);
-		
-		comboBoxStaTerm = new JComboBox<String>();
-		comboBoxStaTerm.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				StatisticMethod sm = new StatisticMethod(comboBoxStaTerm.getSelectedItem().toString());
-				btnMonday.setText(sm.getDays("Monday"));
-				btnTuesday.setText(sm.getDays("Tuesday"));
-				btnWednesday.setText(sm.getDays("Wednesday"));
-				btnThursday.setText(sm.getDays("Thursday"));
-				btnFriday.setText(sm.getDays("Friday"));
-				btnSaturday.setText(sm.getDays("Saturday"));
-				btnSunday.setText(sm.getDays("Sunday"));
-			}
-		});
-		comboBoxStaTerm.setBounds(312, 132, 178, 23);
-//		comboBoxStaTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
-		StatisticsTab.add(comboBoxStaTerm);
-		
-		btnMonday = new JButton("Monday:");
-		btnMonday.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				new StatisticMethod().fillTerm_Day(StaticTerm_Day, comboBoxStaTerm.getSelectedItem().toString(), "Monday");
-			}
-		});
-		btnMonday.setBounds(49, 185, 129, 23);
-		StatisticsTab.add(btnMonday);
-		
-		btnTuesday = new JButton("Tuesday:");
-		btnTuesday.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				new StatisticMethod().fillTerm_Day(StaticTerm_Day, comboBoxStaTerm.getSelectedItem().toString(), "Tuesday");
-			}
-		});
-		btnTuesday.setBounds(202, 185, 129, 23);
-		StatisticsTab.add(btnTuesday);
-		
-		btnWednesday = new JButton("Wednesday:");
-		btnWednesday.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				new StatisticMethod().fillTerm_Day(StaticTerm_Day, comboBoxStaTerm.getSelectedItem().toString(), "Wednesday");
-			}
-		});
-		btnWednesday.setBounds(360, 185, 129, 23);
-		StatisticsTab.add(btnWednesday);
-		
-		btnThursday = new JButton("Thursday:");
-		btnThursday.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				new StatisticMethod().fillTerm_Day(StaticTerm_Day, comboBoxStaTerm.getSelectedItem().toString(), "Thursday");
-			}
-		});
-		btnThursday.setBounds(49, 237, 129, 23);
-		StatisticsTab.add(btnThursday);
-		
-		btnFriday = new JButton("Friday:");
-		btnFriday.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				new StatisticMethod().fillTerm_Day(StaticTerm_Day, comboBoxStaTerm.getSelectedItem().toString(), "Friday");
-			}
-		});
-		btnFriday.setBounds(202, 237, 129, 23);
-		StatisticsTab.add(btnFriday);
-		
-		btnSaturday = new JButton("Saturday");
-		btnSaturday.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				new StatisticMethod().fillTerm_Day(StaticTerm_Day, comboBoxStaTerm.getSelectedItem().toString(), "Saturday");
-			}
-		});
-		btnSaturday.setBounds(360, 237, 129, 23);
-		StatisticsTab.add(btnSaturday);
-		
-
-		btnSunday = new JButton("Sunday:");
-		btnSunday.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				new StatisticMethod().fillTerm_Day(StaticTerm_Day, comboBoxStaTerm.getSelectedItem().toString(), "Sunday");
-			}
-		});
-		btnSunday.setBounds(49, 284, 129, 23);
-		StatisticsTab.add(btnSunday);
-		btnMonday.setEnabled(false);btnTuesday.setEnabled(false);btnWednesday.setEnabled(false);
-		btnThursday.setEnabled(false);btnFriday.setEnabled(false);btnSaturday.setEnabled(false);
-		btnSunday.setEnabled(false);
-		
 		JLabel lblStudentsNumberBased_1 = new JLabel("Students number based on term and coach: ");
 		lblStudentsNumberBased_1.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		lblStudentsNumberBased_1.setBounds(49, 340, 294, 23);
+		lblStudentsNumberBased_1.setBounds(49, 84, 294, 23);
 		StatisticsTab.add(lblStudentsNumberBased_1);
 		
 		comboBoxStaCoach = new JComboBox<String>();
@@ -2262,11 +2415,11 @@ public class ChacoSwim extends JFrame {
 				
 			}
 		});
-		comboBoxStaCoach.setBounds(341, 340, 148, 23);
+		comboBoxStaCoach.setBounds(341, 85, 148, 23);
 		StatisticsTab.add(comboBoxStaCoach);
 		
 		JScrollPane scrollPane_6 = new JScrollPane();
-		scrollPane_6.setBounds(49, 380, 440, 173);
+		scrollPane_6.setBounds(49, 114, 440, 321);
 		StatisticsTab.add(scrollPane_6);
 		
 		listCoach = new JList<String>();
@@ -2288,28 +2441,12 @@ public class ChacoSwim extends JFrame {
 		lblTotalreg.setBounds(254, 49, 77, 23);
 		StatisticsTab.add(lblTotalreg);
 		
-		
-		JSeparator separator_5 = new JSeparator();
-		separator_5.setBounds(10, 327, 1043, 2);
-		StatisticsTab.add(separator_5);
-		
-		JLabel lblTermday = new JLabel("Term&Day:");
-		lblTermday.setBounds(578, 111, 86, 14);
-		StatisticsTab.add(lblTermday);
-		
-		JScrollPane scrollPane_7 = new JScrollPane();
-		scrollPane_7.setBounds(580, 133, 473, 181);
-		StatisticsTab.add(scrollPane_7);
-		
-		StaticTerm_Day = new JTable();
-		scrollPane_7.setViewportView(StaticTerm_Day);
-		
 		JLabel lblTermcoach = new JLabel("Term&Coach:");
-		lblTermcoach.setBounds(578, 345, 86, 14);
+		lblTermcoach.setBounds(578, 86, 86, 14);
 		StatisticsTab.add(lblTermcoach);
 		
 		JScrollPane scrollPane_8 = new JScrollPane();
-		scrollPane_8.setBounds(578, 370, 473, 181);
+		scrollPane_8.setBounds(578, 114, 473, 321);
 		StatisticsTab.add(scrollPane_8);
 		
 		StaticTerm_Coach = new JTable();
@@ -2503,7 +2640,6 @@ public class ChacoSwim extends JFrame {
 								
 								comboBoxTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
 								comboBoxEmailTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
-								comboBoxStaTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
 								comboBoxExTerm.setModel(new DefaultComboBoxModel<String>(getTables("terms")));
 								comboBoxStaCoach.setModel(new DefaultComboBoxModel<String>(new StatisticMethod().getCoaches()));
 								new TabCoaches(jtCoaches).refreshTable();

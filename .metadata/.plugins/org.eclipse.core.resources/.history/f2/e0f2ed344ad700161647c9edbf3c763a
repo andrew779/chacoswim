@@ -1,0 +1,84 @@
+package view;
+
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.border.EmptyBorder;
+
+import net.miginfocom.swing.MigLayout;
+
+public class preView extends JFrame {
+
+	private JPanel contentPane;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					preView frame = new preView();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	
+	
+	/**
+	 * Create the frame.
+	 */
+	public preView() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 450, 300);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(new BorderLayout(0, 0));
+		setContentPane(contentPane);
+		
+		contentPane.add(waitingListView());
+	}
+	
+	public JTable listTable;
+	public JButton CheckIn,Remove,Refresh,Add,Reset;
+	
+	public JPanel waitingListView(){
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new MigLayout());
+		//#listPanel
+		JPanel listPanel = new JPanel();
+		listPanel.setLayout(new MigLayout());
+		listPanel.setBorder(BorderFactory.createTitledBorder("Waiting List"));
+		//waiting list table
+		listTable = new JTable();
+		listPanel.add(listTable);
+		//add listPanel to mainPanel
+		mainPanel.add(listPanel,"");
+		
+		//#listPanel Controller
+		JPanel listPC = new JPanel();
+		listPC.setLayout(new MigLayout());
+		listPC.setBorder(BorderFactory.createTitledBorder("Controller"));
+		CheckIn = new JButton("CheckIn");
+		Remove = new JButton("Remove");
+		Refresh = new JButton("Refresh");
+		listPC.add(CheckIn,"sg controller,wrap");
+		listPC.add(Remove,"sg controller,wrap");
+		listPC.add(Refresh,"sg controller,wrap");
+		//add listPC to mainPanel
+		mainPanel.add(listPC,"gapleft 30,wrap");
+		
+		
+		return mainPanel;
+	}
+
+}

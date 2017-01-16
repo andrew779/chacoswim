@@ -6,6 +6,9 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import model.ChacoSwimModel;
+
 import java.awt.Image;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -27,6 +30,8 @@ import javax.swing.ImageIcon;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.SystemColor;
+
+import javax.sql.rowset.CachedRowSet;
 import javax.swing.ComboBoxModel;
 import javax.swing.JSeparator;
 
@@ -53,6 +58,7 @@ public class CourseModification extends JFrame {
 	private JTextField tfAmount;
 	private JComboBox<String> comboBoxPay;
 	private DefaultComboBoxModel<String> modelPay;
+	private String targetLevel;
 	/**
 	 * Launch the application.
 	 */
@@ -148,6 +154,31 @@ public class CourseModification extends JFrame {
 	/**
 	 * TODO addNew record
 	 */
+	public void addNew(String level){
+		String query="INSERT INTO 'main'.'active_record' ('termID','sid','locationID','day','time','line','coachID','levelID','payment_method','amount') VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10)";
+		try {
+			PreparedStatement pst = conn.prepareStatement(query);
+			DataBaseManage dbm = new DataBaseManage();
+			pst.setString(1, dbm.gotId("terms", term));
+			pst.setString(2,tfSID.getText().toString());
+			pst.setString(3, dbm.gotId("location", location));
+			pst.setString(4, comboBoxDays.getSelectedItem().toString());
+			String time = comboBoxStart.getSelectedItem().toString()+"-"+comboBoxEnd.getSelectedItem().toString();
+			pst.setString(5, time);
+			pst.setString(6, comboBoxLine.getSelectedItem().toString());
+			pst.setString(7,dbm.gotId("coach", comboBoxCoach.getSelectedItem().toString()));
+			//get current level from student record
+			pst.setString(8, dbm.gotId("level", level));
+			//get current level from comboBox selection
+			pst.setString(9, comboBoxPay.getSelectedItem().toString());
+			pst.setString(10, tfAmount.getText());
+			pst.execute();
+			
+			pst.close();
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, e);
+		}
+	}
 	public void addNew(){
 		String query="INSERT INTO 'main'.'active_record' ('termID','sid','locationID','day','time','line','coachID','levelID','payment_method','amount') VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10)";
 		try {
@@ -161,7 +192,9 @@ public class CourseModification extends JFrame {
 			pst.setString(5, time);
 			pst.setString(6, comboBoxLine.getSelectedItem().toString());
 			pst.setString(7,dbm.gotId("coach", comboBoxCoach.getSelectedItem().toString()));
+			//get current level from student record
 			pst.setString(8, dbm.gotId("level", dbm.getCurLevel(tfSID.getText().toString())));
+			//get current level from comboBox selection
 			pst.setString(9, comboBoxPay.getSelectedItem().toString());
 			pst.setString(10, tfAmount.getText());
 			pst.execute();
@@ -170,6 +203,40 @@ public class CourseModification extends JFrame {
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, e);
 		}
+	}
+	
+	
+	
+	public void updateWaitingListCheckIn(String sid,String term,String location,String level,String day, String time){
+		action = "waitingListAdd";
+		targetLevel = level;
+		this.term = term;
+		this.location = location;
+		lblTerm.setText("Term: "+term+"              Location: "+location);
+		ChacoSwimModel csm = new ChacoSwimModel();
+		String query = "SELECT * FROM students where sid = "+sid;
+		CachedRowSet crs = csm.excuteWithRS(query);
+		tfSID.setText(sid);
+		try {
+			while(crs.next()){
+				textFieldFirstName.setText(crs.getString("firstname"));
+				textFieldLastName.setText(crs.getString("lastname"));
+				String curLevel = crs.getString("CurLevel");
+				if(!curLevel.equalsIgnoreCase(level)){
+					JOptionPane.showMessageDialog(null, "Please pay attention that current level ("+curLevel+") in waiting list doesn't match it's record in student reg info("
+							+level+ ")");
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		String timeStart = time.substring(0, time.indexOf("-"));
+		String timeEnd = time.substring(time.indexOf("-")+1);
+		comboBoxDays.setSelectedItem(day);
+		comboBoxStart.setSelectedItem(timeStart);
+		comboBoxEnd.setSelectedItem(timeEnd);
+		
 	}
 	
 	public void updateCourseInfo(String id,String term){
@@ -362,7 +429,12 @@ public class CourseModification extends JFrame {
 					JOptionPane.showMessageDialog(null, "New record added");
 					jbtn2.doClick();
 					frameCourse.dispose();
-				}	
+				}
+				else if (action.equals("waitingListAdd")){
+					addNew(targetLevel);
+					JOptionPane.showMessageDialog(null, "New record added");
+					dispose();
+				}
 				else
 					JOptionPane.showMessageDialog(null, "No action string detected");
 			}
@@ -373,8 +445,14 @@ public class CourseModification extends JFrame {
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				jbtn2.doClick();
-				frameCourse.dispose();
+				if (action.equals("waitingListAdd")){
+					dispose();
+				}
+				else{
+					jbtn2.doClick();
+					frameCourse.dispose();
+				}
+				
 			}
 		});
 		btnCancel.setBounds(394, 370, 89, 23);
