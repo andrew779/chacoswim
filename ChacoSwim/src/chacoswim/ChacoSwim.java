@@ -732,8 +732,8 @@ public class ChacoSwim extends JFrame {
 		
 			int row = table.getSelectedRow();
 			if(row!=-1){
-			String id = table.getModel().getValueAt(row, 0).toString();
-			return id;
+				String id = table.getValueAt(row, 0).toString();
+				return id;
 			}
 			return "";
 			
@@ -1026,6 +1026,8 @@ public class ChacoSwim extends JFrame {
 		btnAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String id = updateSID();
+				
+				
 				if(!id.isEmpty()){
 					CourseModification.main(new String[]{"add",id,comboBoxTerm.getSelectedItem().toString(),comboBoxLocation.getSelectedItem().toString()},btnRefreshAll);
 					lblTotal.setText("Total: "+String.valueOf(tableTerm.getRowCount()));
@@ -1088,6 +1090,7 @@ public class ChacoSwim extends JFrame {
 		btnEditStudent.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String id = updateSID();
+				
 				if(!id.isEmpty()){
 					StudentModification.main(id,btnRefreshAll);
 				}
@@ -2052,12 +2055,17 @@ public class ChacoSwim extends JFrame {
 				Properties props= new Properties();
 				
 // Gmail
-				props.put("mail.smtp.host", "smtp.gmail.com");
+//				props.put("mail.smtp.host", "smtp.gmail.com");
+//				props.put("mail.smtp.socketFactory.port", "465");
+//				props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+//				props.put("mail.smtp.auth", "true");
+//				props.put("mail.smtp.port", "465");
+				
+				props.put("mail.smtp.host", "smtpout.secureserver.net");
 				props.put("mail.smtp.socketFactory.port", "465");
 				props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 				props.put("mail.smtp.auth", "true");
 				props.put("mail.smtp.port", "465");
-				
 
 //hotmail
 //				props.setProperty("mail.transport.protocol", "stmp");
@@ -2069,8 +2077,7 @@ public class ChacoSwim extends JFrame {
 				Session session = Session.getDefaultInstance(props,
 						new javax.mail.Authenticator(){
 							protected PasswordAuthentication getPasswordAuthentication(){
-								return new PasswordAuthentication("andrew198712@gmail.com","zz208516");
-//								return new PasswordAuthentication("wenzhong.zheng@hotmail.com","208516Zz");
+								return new PasswordAuthentication("info@chacoswim.com","123456");
 							}
 						}
 						);
@@ -2080,8 +2087,7 @@ public class ChacoSwim extends JFrame {
 				
 				try{
 					Message message=new MimeMessage(session);
-					//message.setFrom(new InternetAddress("andrew198712@gmail.com","Wenzhong zzz"));
-					message.setFrom(new InternetAddress("info@chacoswim.com","Wenzhong zzz"));
+					message.setFrom(new InternetAddress("info@chacoswim.com","ChacoSwim"));
 					if(address.length==1)message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(address[0].toString()));
 					else if(address.length>1){
 						for(String i:address){

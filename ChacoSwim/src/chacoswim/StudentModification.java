@@ -250,7 +250,7 @@ public String[] getLevel(){
 		contentPane.add(lblFirstname);
 		
 		tfFirstname = new JTextField();
-		tfFirstname.setBounds(109, 27, 123, 20);
+		tfFirstname.setBounds(109, 27, 123, 25);
 		contentPane.add(tfFirstname);
 		tfFirstname.setColumns(10);
 		
@@ -260,7 +260,7 @@ public String[] getLevel(){
 		
 		tfLastname = new JTextField();
 		tfLastname.setColumns(10);
-		tfLastname.setBounds(109, 68, 123, 20);
+		tfLastname.setBounds(109, 68, 123, 25);
 		contentPane.add(tfLastname);
 		
 		JLabel lblAge = new JLabel("Age: ");
@@ -269,7 +269,7 @@ public String[] getLevel(){
 		
 		tfAge = new JTextField();
 		tfAge.setColumns(10);
-		tfAge.setBounds(109, 107, 60, 20);
+		tfAge.setBounds(109, 107, 60, 25);
 		contentPane.add(tfAge);
 		
 		JLabel lblPrelevel = new JLabel("PreLevel:");
@@ -306,17 +306,17 @@ public String[] getLevel(){
 		
 		tfHomephone = new JTextField();
 		tfHomephone.setColumns(10);
-		tfHomephone.setBounds(109, 227, 123, 20);
+		tfHomephone.setBounds(109, 227, 123, 25);
 		contentPane.add(tfHomephone);
 		
 		tfCell = new JTextField();
 		tfCell.setColumns(10);
-		tfCell.setBounds(109, 267, 123, 20);
+		tfCell.setBounds(109, 267, 123, 25);
 		contentPane.add(tfCell);
 		
 		tfEmail = new JTextField();
 		tfEmail.setColumns(10);
-		tfEmail.setBounds(109, 310, 123, 20);
+		tfEmail.setBounds(109, 310, 140, 25);
 		contentPane.add(tfEmail);
 		
 		chckbxYes = new JCheckBox("Yes");
@@ -325,12 +325,12 @@ public String[] getLevel(){
 		
 		tfHealthcard = new JTextField();
 		tfHealthcard.setColumns(10);
-		tfHealthcard.setBounds(109, 390, 123, 20);
+		tfHealthcard.setBounds(109, 390, 123, 25);
 		contentPane.add(tfHealthcard);
 		
 		tfAllergy = new JTextField();
 		tfAllergy.setColumns(10);
-		tfAllergy.setBounds(109, 430, 123, 20);
+		tfAllergy.setBounds(109, 430, 123, 25);
 		contentPane.add(tfAllergy);
 		
 		JLabel lblPs = new JLabel("PS:");
@@ -339,7 +339,7 @@ public String[] getLevel(){
 		
 		tfPs = new JTextField();
 		tfPs.setColumns(10);
-		tfPs.setBounds(109, 470, 123, 20);
+		tfPs.setBounds(109, 470, 123, 25);
 		contentPane.add(tfPs);
 		
 		JButton btnSubmit = new JButton("Submit");
@@ -394,14 +394,14 @@ public String[] getLevel(){
 		contentPane.add(btnCancel);
 		
 		comboBoxPreLevel = new JComboBox<String>();
-		comboBoxPreLevel.setBounds(109, 146, 111, 23);
+		comboBoxPreLevel.setBounds(109, 146, 140, 25);
 		modelPreLevel = new DefaultComboBoxModel<String>(getLevel());
 		comboBoxPreLevel.setModel(modelPreLevel);
 		
 		contentPane.add(comboBoxPreLevel);
 		
 		comboBoxCurLevel = new JComboBox<String>();
-		comboBoxCurLevel.setBounds(109, 190, 111, 23);
+		comboBoxCurLevel.setBounds(109, 190, 140, 25);
 		modelCurLevel = new DefaultComboBoxModel<String>(getLevel());
 		comboBoxCurLevel.setModel(modelCurLevel);
 		contentPane.add(comboBoxCurLevel);
@@ -412,7 +412,7 @@ public String[] getLevel(){
 		
 		tfComment = new JTextField();
 		tfComment.setColumns(10);
-		tfComment.setBounds(109, 507, 123, 20);
+		tfComment.setBounds(109, 507, 123, 25);
 		contentPane.add(tfComment);
 		contentPane.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{tfFirstname, tfLastname, tfAge, tfHomephone, tfCell, tfEmail, chckbxYes, tfHealthcard, tfAllergy, tfPs, btnSubmit, btnClear, btnCancel, lblFirstname, textArea, lblLastname, lblAge, lblPrelevel, lblCurlevel, lblHomephone, lblCell, lblEmail, lblForm, lblHealthcard, lblAllergy, lblPs, scrollPane}));
 		

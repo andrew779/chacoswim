@@ -331,7 +331,7 @@ public class CourseModification extends JFrame {
 		tfSID = new JTextField();
 		lblSid.setLabelFor(tfSID);
 		tfSID.setEditable(false);
-		tfSID.setBounds(52, 81, 103, 20);
+		tfSID.setBounds(52, 81, 103, 25);
 		panel.add(tfSID);
 		tfSID.setColumns(10);
 		
@@ -348,7 +348,7 @@ public class CourseModification extends JFrame {
 		textFieldFirstName = new JTextField();
 		textFieldFirstName.setEditable(false);
 		textFieldFirstName.setColumns(10);
-		textFieldFirstName.setBounds(262, 81, 103, 20);
+		textFieldFirstName.setBounds(262, 81, 103, 25);
 		panel.add(textFieldFirstName);
 		
 		JLabel lblLastname = new JLabel("LastName:");
@@ -358,7 +358,7 @@ public class CourseModification extends JFrame {
 		textFieldLastName = new JTextField();
 		textFieldLastName.setEditable(false);
 		textFieldLastName.setColumns(10);
-		textFieldLastName.setBounds(479, 81, 103, 20);
+		textFieldLastName.setBounds(479, 81, 103, 25);
 		panel.add(textFieldLastName);
 		
 		JLabel lblCourseInfomation = new JLabel("Course Infomation");
@@ -373,7 +373,7 @@ public class CourseModification extends JFrame {
 		
 		modelDays = new DefaultComboBoxModel<String>(new String[] {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"});
 		comboBoxDays = new JComboBox<String>(modelDays);
-		comboBoxDays.setBounds(52, 181, 103, 20);
+		comboBoxDays.setBounds(52, 181, 103, 25);
 		panel.add(comboBoxDays);
 		
 		
@@ -385,7 +385,7 @@ public class CourseModification extends JFrame {
 		
 		modelCoach = new DefaultComboBoxModel<String>(getCoach());
 		comboBoxCoach = new JComboBox<String>(modelCoach);
-		comboBoxCoach.setBounds(262, 179, 103, 20);
+		comboBoxCoach.setBounds(262, 179, 103, 25);
 		panel.add(comboBoxCoach);
 		
 		JLabel lblLine = new JLabel("Line:");
@@ -394,7 +394,7 @@ public class CourseModification extends JFrame {
 		
 		modelLine = new DefaultComboBoxModel<String>(new String[] {"1", "2", "3", "4", "5","6"});
 		comboBoxLine = new JComboBox<String>(new DefaultComboBoxModel<String>(new String[] {"1", "2", "3", "4", "5", "6"}));
-		comboBoxLine.setBounds(479, 181, 103, 20);
+		comboBoxLine.setBounds(479, 181, 103, 25);
 		panel.add(comboBoxLine);
 		
 		JLabel lblStartTime = new JLabel("Start Time:");
@@ -403,7 +403,7 @@ public class CourseModification extends JFrame {
 		
 		modelStart = new DefaultComboBoxModel<String>(new String[] {"N/A", "10:00", "10:30", "11:00", "11:30", "12:00","12:30","13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30"});
 		comboBoxStart = new JComboBox<String>(modelStart);
-		comboBoxStart.setBounds(133, 245, 103, 20);
+		comboBoxStart.setBounds(133, 245, 103, 25);
 		panel.add(comboBoxStart);
 		
 		JLabel lblEndTime = new JLabel("End Time:");
@@ -412,7 +412,7 @@ public class CourseModification extends JFrame {
 		
 		modelEnd = new DefaultComboBoxModel<String>(new String[]{"N/A", "10:00", "10:30", "11:00", "11:30", "12:00","12:30","13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30"});
 		comboBoxEnd = new JComboBox<String>(modelEnd);
-		comboBoxEnd.setBounds(434, 245, 103, 20);
+		comboBoxEnd.setBounds(434, 245, 103, 25);
 		panel.add(comboBoxEnd);
 		
 		JButton btnUpdate = new JButton("Update");
@@ -470,7 +470,7 @@ public class CourseModification extends JFrame {
 		
 		modelPay = new DefaultComboBoxModel<String>(new String[] {"Unpaid", "Cash", "Cheque", "EMT", "CreditCard", "BankDraft", "N/A"});
 		comboBoxPay = new JComboBox<String>(modelPay);
-		comboBoxPay.setBounds(133, 298, 103, 20);
+		comboBoxPay.setBounds(133, 298, 103, 25);
 		panel.add(comboBoxPay);
 		
 		JLabel lblAmount = new JLabel("Amount:");
@@ -478,7 +478,7 @@ public class CourseModification extends JFrame {
 		panel.add(lblAmount);
 		
 		tfAmount = new JTextField();
-		tfAmount.setBounds(434, 298, 103, 20);
+		tfAmount.setBounds(434, 298, 103, 25);
 		panel.add(tfAmount);
 		tfAmount.setColumns(10);
 		
